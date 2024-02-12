@@ -1,0 +1,8 @@
+bin/auth0-*
+.env.private
+.config/wakatime/.wakatime.cfg
+.aws/config
+Library/Fonts
+
+.ssh/config.d/marqeta.conf
+

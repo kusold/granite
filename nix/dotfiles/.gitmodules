@@ -1,0 +1,4 @@
+[submodule "nerd-fonts"]
+	path = nerd-fonts
+	shallow = true
+	url = https://github.com/ryanoasis/nerd-fonts.git

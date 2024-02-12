@@ -1,0 +1,88 @@
+[user]
+  name = Mike Kusold
+  email = git@mikekusold.com
+  signingkey = E7BB2BF9
+[color]
+  branch = auto
+  diff = auto
+  status = auto
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
+[merge]
+  tool = fugitive
+  conflictstyle = diff3
+[mergetool "fugitive"]
+    cmd = vim -f -c \"Gdiff\" \"$MERGED\"
+[diff]
+  tool = meld
+  compactionHeuristic = true
+  wsErrorHighlight = all
+[difftool]
+  prompt = false
+[difftool "webstorm"]
+  cmd = webstorm diff $(cd $(dirname "$LOCAL") && pwd)/$(basename "$LOCAL") $(cd $(dirname "$REMOTE") && pwd)/$(basename "$REMOTE")
+  trustExitCode = true
+[mergetool "webstorm"]
+  cmd = webstorm merge $(cd $(dirname "$LOCAL") && pwd)/$(basename "$LOCAL") $(cd $(dirname "$REMOTE") && pwd)/$(basename "$REMOTE") $(cd $(dirname "$BASE") && pwd)/$(basename "$BASE") $(cd $(dirname "$MERGED") && pwd)/$(basename "$MERGED")
+  trustExitCode = true
+[core]
+  autocrlf = input
+  legacyheaders = false
+  editor = vim
+  excludesfile = ~/.gitignore
+[gui]
+  fontdiff = -family Monaco -size 12 -weight normal -slant roman -underline 0 -overstrike 0
+[repack]
+  usedeltabaseoffset = true
+[alias]
+  ci = commit
+  co = checkout
+  st = status
+  br = branch
+  ch = cherry -v origin
+  mine = log --author=Mike
+  spull = !git svn fetch && git svn rebase
+  spush = !git svn dcommit
+  hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+  type = cat-file -t
+  dump = cat-file -p
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --
+  prune-merged = !git branch --merged | grep -v \"\\*\" | xargs -n 1 git branch -d
+  subpull = !git submodule foreach git pull --tags origin master
+  history-search = "!git rev-list --all | xargs git grep"
+  
+  # Support for stacked PRs
+  # gitext-rs/git-stack - https://github.com/gitext-rs/git-stack
+  next = stack next
+  prev = stack previous
+  reword = stack reword
+  amend = stack amend
+  sync = stack sync
+  run = stack run
+[push]
+  default = simple
+
+[filter "remove-tokens"]
+clean = "sed -e '/^_auth =.*/d' | sed -e '/^AuthSession =.*/d' | sed -e '/^expires =.*/d' | sed -e '/_authToken=.*/d'"
+[submodule]
+  fetchJobs = 4
+[gpg]
+  program = gpg
+[credential]
+  helper = osxkeychain
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

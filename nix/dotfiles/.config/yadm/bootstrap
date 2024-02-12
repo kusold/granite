@@ -1,0 +1,33 @@
+#! /usr/bin/env bash
+
+YADM_BOOTSTRAP="${XDG_CONFIG_HOME:-$HOME/.config}/yadm/bootstraps"
+system_type=$(uname -s)
+
+
+echo "init submodules"
+#yadm submodule update --init --recursive
+
+echo "creating directories"
+source $YADM_BOOTSTRAP/directories.sh
+
+echo "installing fonts"
+source $YADM_BOOTSTRAP/fonts.sh
+
+if [ "$system_type" = "Darwin" ]; then
+	echo "installing homebrew packages"
+	source $YADM_BOOTSTRAP/brew.sh
+fi
+
+#source $YADM_BOOTSTRAP/npm.sh
+#source $YADM_BOOTSTRAP/pip.sh
+#source $YADM_BOOTSTRAP/gem.sh
+
+if [ "$system_type" = "Darwin" ]; then
+	echo "configure macos"
+	source $YADM_BOOTSTRAP/macos.sh
+fi
+
+source $YADM_BOOTSTRAP/shell.sh
+source $YADM_BOOTSTRAP/terminfo.sh
+source $YADM_BOOTSTRAP/home.sh
+

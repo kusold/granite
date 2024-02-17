@@ -18,6 +18,7 @@
       pkgs.bat
       pkgs.bfg-repo-cleaner
       pkgs.gh
+      pkgs.gitleaks
       pkgs.go-migrate
       pkgs.go-task
       pkgs.htop

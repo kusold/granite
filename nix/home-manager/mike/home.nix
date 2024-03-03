@@ -28,10 +28,13 @@
     pkgs.kompose
     pkgs.kubernetes-helm
     pkgs.kustomize
+    pkgs.nixpkgs-fmt
     pkgs.nodejs_20
     pkgs.ponysay
     pkgs.pre-commit
     pkgs.restic
+    pkgs.cargo # language:rust
+    pkgs.rustc # language:rust
     #pkgs.resticprofile
     pkgs.ripgrep
     pkgs.shellcheck

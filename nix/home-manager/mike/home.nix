@@ -7,7 +7,7 @@
   ++ lib.optionals (darwin) [
     (import ../_modules/darwin.nix (args))
   ];
-  home.stateVersion = "23.05";
+  home.stateVersion = "23.11";
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnfreePredicate = _: true;
 

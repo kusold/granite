@@ -38,6 +38,7 @@
     pkgs.kompose
     pkgs.kubernetes-helm
     pkgs.kustomize
+    pkgs.mosh
     pkgs.nixpkgs-fmt
     pkgs.nodejs_20
     pkgs.ponysay

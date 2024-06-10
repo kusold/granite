@@ -1,48 +1,63 @@
-{ config, lib, pkgs, pkgs-unstable, gui, darwin, inputs, ... }@args: {
-  imports = [
-    ../_modules/git.nix
-    ../_modules/neovim.nix
-    ../_modules/zsh.nix
-  ]
-  ++ lib.optionals (darwin) [
-    (import ../_modules/darwin.nix (args))
-  ];
+{
+  config,
+  lib,
+  pkgs,
+  pkgs-unstable,
+  gui,
+  darwin,
+  inputs,
+  ...
+} @ args: {
+  imports =
+    [
+      ../_modules/git.nix
+      ../_modules/neovim.nix
+      ../_modules/zsh.nix
+    ]
+    ++ lib.optionals darwin [
+      (import ../_modules/darwin.nix args)
+    ];
 
   home.stateVersion = "23.11";
-  home.packages = [
-    pkgs.awscli2
-    pkgs.aws-sam-cli
-    pkgs.bat
-    pkgs.gh
-    pkgs.helm
-    pkgs.htop
-    pkgs.jq
-    pkgs.k9s
-    pkgs.ponysay
-    pkgs.restic
-    pkgs.ripgrep
-    pkgs.ssh-copy-id
-    pkgs.tree
-    pkgs.unar
+  home.packages =
+    [
+      pkgs.awscli2
+      pkgs.aws-sam-cli
+      pkgs.bat
+      pkgs.gh
+      pkgs.helm
+      pkgs.htop
+      pkgs.jq
+      pkgs.k9s
+      pkgs.ponysay
+      pkgs.restic
+      pkgs.ripgrep
+      pkgs.ssh-copy-id
+      pkgs.tree
+      pkgs.unar
 
-    pkgs.wget
-    pkgs-unstable.yt-dlp
-    pkgs.shellcheck
+      pkgs.wget
+      pkgs-unstable.yt-dlp
+      pkgs.shellcheck
 
-    # Added while trying to get neovim working well
-    pkgs.gnumake
-    pkgs.gcc
-    pkgs.nodejs_20
-    pkgs.unzip
-    pkgs.go
-  ] ++ lib.optionals (gui) [
-    pkgs-unstable.jetbrains.idea-ultimate
-    pkgs-unstable.vscode
-  ];
+      # Added while trying to get neovim working well
+      pkgs.gnumake
+      pkgs.gcc
+      pkgs.nodejs_20
+      pkgs.unzip
+      pkgs.go
+    ]
+    ++ lib.optionals gui [
+      pkgs-unstable.jetbrains.idea-ultimate
+      pkgs-unstable.vscode
+    ];
   programs.home-manager.enable = true;
 
   programs.kitty = {
-    enable = if gui then true else false; # Yes, this could just be gui, but I'm still playing with how I want to structure this.
+    enable =
+      if gui
+      then true
+      else false; # Yes, this could just be gui, but I'm still playing with how I want to structure this.
     darwinLaunchOptions = [
       "--single-instance"
     ];

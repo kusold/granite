@@ -1,4 +1,13 @@
-{ config, lib, pkgs, pkgs-unstable, gui, darwin, inputs, ... }@args: {
+{
+  config,
+  lib,
+  pkgs,
+  pkgs-unstable,
+  gui,
+  darwin,
+  inputs,
+  ...
+} @ args: {
   programs.neovim = {
     enable = true;
     defaultEditor = true;

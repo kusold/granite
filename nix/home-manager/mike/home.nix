@@ -61,7 +61,7 @@
     pkgs.sqlite
     pkgs.ssh-copy-id
     pkgs.ssh-copy-id
-    pkgs.terraform
+    pkgs.opentofu
     pkgs.tmux
     pkgs.tree
     pkgs.unar

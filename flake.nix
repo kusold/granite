@@ -37,17 +37,17 @@
           ./home-manager/mike/home.nix
         ];
       };
-      #      "mkusold" = home-manager.lib.homeManagerConfiguration {
-      #        pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-      #        modules = [
-      #          ./home-manager/mkusold/home.nix
-      #        ];
-      #      };
+      "mkusold" = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+        modules = [
+          ./home-manager/mkusold/home.nix
+        ];
+      };
     };
     # Attempt to let the user config to be imported by nixos homemanager
     homeConfigurationsModules = {
       "mike" = ./home-manager/mike/home.nix;
-      #      "mkusold" = ./home-manager/mkusold/home.nix;
+      "mkusold" = ./home-manager/mkusold/home.nix;
     };
   };
 }

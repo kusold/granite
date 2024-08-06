@@ -18,7 +18,7 @@
   ];
   home.stateVersion = "23.11";
   home.username = "mike";
-  home.homeDirectory = "/Users/mike";
+  home.homeDirectory = lib.mkDefault "/Users/mike";
   # nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.allowUnfreePredicate = _: true;
 

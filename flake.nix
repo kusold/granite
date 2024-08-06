@@ -51,7 +51,6 @@
         "mike" = ./home-manager/mike/home.nix;
         #      "mkusold" = ./home-manager/mkusold/home.nix;
       };
-      }
     };
 }
 

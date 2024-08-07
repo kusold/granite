@@ -17,7 +17,7 @@
     #      (import ../_modules/darwin.nix args)
   ];
 
-  home.stateVersion = "23.11";
+  home.stateVersion = "24.05";
 
   home.packages = [
     pkgs.aws-sam-cli

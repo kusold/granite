@@ -35,17 +35,25 @@
         #        extraSpecialArgs = {inherit inputs outputs;};
         modules = [
           ./home-manager/mike/home.nix
+          {
+            home.username = "mike";
+            home.homeDirectory = "/Users/mike";
+          }
         ];
       };
       "mkusold" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.aarch64-darwin;
         modules = [
           ./home-manager/mkusold/home.nix
+          {
+            home.username = "mkusold";
+            home.homeDirectory = "/Users/mkusold";
+          }
         ];
       };
     };
     # Attempt to let the user config to be imported by nixos homemanager
-    homeConfigurationsModules = {
+    homeConfigurationModules = {
       "mike" = ./home-manager/mike/home.nix;
       "mkusold" = ./home-manager/mkusold/home.nix;
     };

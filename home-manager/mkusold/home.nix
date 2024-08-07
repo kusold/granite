@@ -18,8 +18,7 @@
   ];
 
   home.stateVersion = "23.11";
-  home.username = "mkusold";
-  home.homeDirectory = lib.mkDefault "/Users/mkusold";
+
   home.packages = [
     pkgs.aws-sam-cli
     pkgs.awscli2

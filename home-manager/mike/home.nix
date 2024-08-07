@@ -17,8 +17,6 @@
     #   (import ../_modules/darwin.nix args)
   ];
   home.stateVersion = "23.11";
-  home.username = "mike";
-  home.homeDirectory = lib.mkDefault "/Users/mike";
   # nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.allowUnfreePredicate = _: true;
 

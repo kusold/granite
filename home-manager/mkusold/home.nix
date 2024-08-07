@@ -9,6 +9,7 @@
   ...
 } @ args: {
   imports = [
+    ../_modules/common.nix
     ../_modules/git.nix
     ../_modules/neovim.nix
     ../_modules/zsh.nix
@@ -22,27 +23,16 @@
   home.packages = [
     pkgs.aws-sam-cli
     pkgs.awscli2
-    pkgs.bat
     pkgs.docker-compose
-    pkgs.gh
     pkgs.gnupg
-    pkgs.htop
     pkgs.jdk22
-    pkgs.jq
     pkgs.k9s
     pkgs.kubernetes-helm
     pkgs.mas
     pkgs.ponysay
     pkgs.restic
-    pkgs.ripgrep
     pkgs.shellcheck
     pkgs.sqlite
-    pkgs.ssh-copy-id
-    pkgs.tree
-    pkgs.unar
-    pkgs.wget
-    pkgs.yq
-    pkgs.yt-dlp
 
     # Added while trying to get neovim working well
     pkgs.gnumake

@@ -9,6 +9,7 @@
   ...
 } @ args: {
   imports = [
+    ../_modules/common.nix
     ../_modules/git.nix
     ../_modules/neovim.nix
     ../_modules/zsh.nix
@@ -20,27 +21,14 @@
   # nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.allowUnfreePredicate = _: true;
 
-  programs = {
-    direnv = {
-      enable = true;
-      enableZshIntegration = true; # see note on other shells below
-      nix-direnv.enable = true;
-    };
-  };
-
   home.packages = [
-    pkgs.alejandra
     pkgs.ansible
     pkgs.aspell
     pkgs.awscli2
-    pkgs.bat
     pkgs.bfg-repo-cleaner
-    pkgs.gh
     pkgs.gitleaks
     pkgs.go-migrate
     pkgs.go-task
-    pkgs.htop
-    pkgs.jq
     pkgs.k3sup
     pkgs.k9s
     pkgs.kompose
@@ -55,28 +43,14 @@
     pkgs.cargo # language:rust
     pkgs.rustc # language:rust
     #pkgs.resticprofile
-    pkgs.ripgrep
     pkgs.shellcheck
     pkgs.sops
     pkgs.sqlite
-    pkgs.ssh-copy-id
-    pkgs.ssh-copy-id
     pkgs.opentofu
-    pkgs.tmux
-    pkgs.tree
     pkgs.unar
-    pkgs.wget
-    pkgs.yadm
 
     # pkgs-unstable.yt-dlp
     pkgs.yt-dlp
-
-    # Added while trying to get neovim working well
-    # pkgs.gnumake
-    # pkgs.gcc
-    # pkgs.nodejs_20
-    # pkgs.unzip
-    # pkgs.go
     # ]
     # ++ lib.optionals gui [
     # pkgs-unstable.jetbrains.idea-ultimate

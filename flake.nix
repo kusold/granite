@@ -34,7 +34,7 @@
         pkgs = nixpkgs.legacyPackages.aarch64-darwin;
         #        extraSpecialArgs = {inherit inputs outputs;};
         modules = [
-          ./home-manager/mike/home.nix
+          self.homeConfigurationModules.mike
           {
             home.username = "mike";
             home.homeDirectory = "/Users/mike";
@@ -44,7 +44,7 @@
       "mkusold" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.aarch64-darwin;
         modules = [
-          ./home-manager/mkusold/home.nix
+          self.homeConfigurationModules.mkusold
           {
             home.username = "mkusold";
             home.homeDirectory = "/Users/mkusold";

@@ -23,6 +23,8 @@
   home.packages = [
     pkgs.aws-sam-cli
     pkgs.awscli2
+    pkgs.bat
+    pkgs.direnv
     pkgs.docker-compose
     pkgs.gnupg
     pkgs.jdk22

@@ -25,8 +25,8 @@
   ];
 
   home.file."./.config/nvim/" = {
-    #  source = ../../config/nvim;
-    source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/home-manager/config/nvim";
+    source = ../../config/nvim;
+    # source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/home-manager/config/nvim";
     recursive = false;
   };
   #home.file."./.config/nvim/lazy-lock.json" = {

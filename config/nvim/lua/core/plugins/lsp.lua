@@ -187,7 +187,7 @@ return {
         terraformls = {},
         taplo = {},
         tflint = {},
-        tsserver = {},
+        ts_ls = {},
         yamlls = {
           -- Set dynamically
         },

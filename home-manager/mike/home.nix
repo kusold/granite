@@ -35,6 +35,7 @@
     pkgs.kubernetes-helm
     pkgs.kustomize
     pkgs.mosh
+    pkgs.nixd # Nix LSP
     pkgs.nixpkgs-fmt
     pkgs.nodejs_20
     pkgs.ponysay

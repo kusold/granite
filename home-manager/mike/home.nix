@@ -41,6 +41,7 @@
     pkgs.ponysay
     pkgs.pre-commit
     pkgs.restic
+    pkgs.rsync
     pkgs.cargo # language:rust
     pkgs.rustc # language:rust
     #pkgs.resticprofile

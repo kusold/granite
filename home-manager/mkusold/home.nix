@@ -27,10 +27,11 @@
     pkgs.direnv
     pkgs.docker-compose
     pkgs.gnupg
-    pkgs.jdk22
+    pkgs.jdk
     pkgs.k9s
     pkgs.kubernetes-helm
     pkgs.mas
+    pkgs.maven
     pkgs.ponysay
     pkgs.restic
     pkgs.shellcheck

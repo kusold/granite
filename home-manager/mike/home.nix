@@ -40,7 +40,7 @@
     pkgs.nixd # Nix LSP
     pkgs.nixpkgs-fmt
     pkgs.nodejs_20
-    pkgs.opencode
+    pkgs-unstable.opencode
     pkgs.ponysay
     pkgs.pre-commit
     pkgs.restic

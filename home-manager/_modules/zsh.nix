@@ -16,8 +16,7 @@
       . $ZDOTDIR/.zshenv
       . $ZDOTDIR/.zlogin
       . $ZDOTDIR/.zprofile
-    '';
-    initExtraBeforeCompInit = ''
+
       . $ZDOTDIR/.zshrc
     '';
   };

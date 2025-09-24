@@ -22,6 +22,7 @@
   # nixpkgs.config.allowUnfreePredicate = _: true;
 
   home.packages = [
+
     pkgs.ansible
     pkgs.aspell
     pkgs.awscli2
@@ -29,6 +30,7 @@
     pkgs.gitleaks
     pkgs.go-migrate
     pkgs.go-task
+    pkgs.goose-cli
     pkgs.k3sup
     pkgs.k9s
     pkgs.kompose
@@ -38,6 +40,7 @@
     pkgs.nixd # Nix LSP
     pkgs.nixpkgs-fmt
     pkgs.nodejs_20
+    pkgs.opencode
     pkgs.ponysay
     pkgs.pre-commit
     pkgs.restic

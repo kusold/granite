@@ -27,12 +27,14 @@
     # pass to it, with each system as an argument
     forAllSystems = nixpkgs.lib.genAttrs systems;
   in {
-    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+    formatter = forAllSystems (system: nixpkgs-unstable.legacyPackages.${system}.nixfmt-tree);
 
     homeConfigurations = {
       "mike" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-        #        extraSpecialArgs = {inherit inputs outputs;};
+        extraSpecialArgs = {
+          pkgs-unstable = nixpkgs-unstable.legacyPackages.aarch64-darwin;
+        };
         modules = [
           self.homeConfigurationModules.mike
           {
@@ -43,6 +45,9 @@
       };
       "mkusold" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+        extraSpecialArgs = {
+          pkgs-unstable = nixpkgs-unstable.legacyPackages.aarch64-darwin;
+        };
         modules = [
           self.homeConfigurationModules.mkusold
           {

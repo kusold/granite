@@ -1,11 +1,4 @@
 {
-  config,
-  lib,
-  pkgs,
-  pkgs-unstable,
-  gui,
-  darwin,
-  inputs,
   ...
 } @ args: {
   programs.git = {

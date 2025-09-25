@@ -1,11 +1,6 @@
 {
-  config,
-  lib,
   pkgs,
   pkgs-unstable,
-  gui,
-  darwin,
-  inputs,
   ...
 } @ args: {
   imports = [
@@ -54,8 +49,7 @@
     pkgs.opentofu
     pkgs.unar
 
-    # pkgs-unstable.yt-dlp
-    pkgs.yt-dlp
+    pkgs-unstable.yt-dlp
     # ]
     # ++ lib.optionals gui [
     # pkgs-unstable.jetbrains.idea-ultimate

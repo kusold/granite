@@ -7,7 +7,8 @@
   #  darwin,
   inputs,
   ...
-} @ args: {
+}@args:
+{
   imports = [
     ../_modules/common.nix
     ../_modules/git.nix

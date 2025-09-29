@@ -2,7 +2,8 @@
   pkgs,
   pkgs-unstable,
   ...
-} @ args: {
+}@args:
+{
   imports = [
     ../_modules/common.nix
     ../_modules/git.nix
@@ -16,45 +17,66 @@
   # nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.allowUnfreePredicate = _: true;
 
-  home.packages = [
+  home.packages =
+    (with pkgs; [
+      age # encryption tool
+      ansible
+      aspell
+      awscli2 # AWS CLI v2
+      bat # better cat
+      bfg-repo-cleaner
+      exiftool
+      fdupes
+      gh
+      git-filter-repo
+      gitleaks
+      go-migrate
+      go-task
+      golangci-lint
+      goose-cli
+      htop
+      jq
+      k3sup
+      k9s
+      kompose
+      kubernetes-helm
+      kustomize
+      mosh
+      nixd # Nix LSP
+      nixpkgs-fmt
+      opentofu
+      ponysay
+      pre-commit
+      restic
+      resticprofile
+      ripgrep
+      rsync
+      shellcheck
+      sops
+      sqlite
+      ssh-copy-id
+      tmux
+      tree
+      unar
+      vim
+      wakeonlan
+      wget
+      yadm
 
-    pkgs.ansible
-    pkgs.aspell
-    pkgs.awscli2
-    pkgs.bfg-repo-cleaner
-    pkgs.gitleaks
-    pkgs.go-migrate
-    pkgs.go-task
-    pkgs.goose-cli
-    pkgs.k3sup
-    pkgs.k9s
-    pkgs.kompose
-    pkgs.kubernetes-helm
-    pkgs.kustomize
-    pkgs.mosh
-    pkgs.nixd # Nix LSP
-    pkgs.nixpkgs-fmt
-    pkgs.nodejs_20
-    pkgs-unstable.opencode
-    pkgs.ponysay
-    pkgs.pre-commit
-    pkgs.restic
-    pkgs.rsync
-    pkgs.cargo # language:rust
-    pkgs.rustc # language:rust
-    #pkgs.resticprofile
-    pkgs.shellcheck
-    pkgs.sops
-    pkgs.sqlite
-    pkgs.opentofu
-    pkgs.unar
+      go # language:go
+      ruby # language:ruby
+      nodejs # language:javascript
+      python3 # language:python
+      poetry # language:python
+      uv # language:python
+      cargo # language:rust
+      rustc # language:rust
+    ])
+    ++ (with pkgs-unstable; [
+      opencode
+      yt-dlp
+    ]);
 
-    pkgs-unstable.yt-dlp
-    # ]
-    # ++ lib.optionals gui [
-    # pkgs-unstable.jetbrains.idea-ultimate
-    # pkgs-unstable.vscode
-  ];
   programs.home-manager.enable = true;
 
   # programs.kitty = {

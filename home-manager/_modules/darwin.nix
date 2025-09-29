@@ -4,7 +4,8 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
   # Home Manager apps aren't indexed by Spotlight
   # https://github.com/nix-community/home-manager/issues/1341
   # home.activation = {

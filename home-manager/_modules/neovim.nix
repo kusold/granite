@@ -6,7 +6,8 @@
   darwin,
   inputs,
   ...
-} @ args: {
+}@args:
+{
   programs.neovim = {
     enable = true;
     defaultEditor = true;

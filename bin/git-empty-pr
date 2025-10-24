@@ -1,0 +1,52 @@
+#!/bin/bash
+set -e  # Exit on error
+
+# Save current branch
+ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+echo "📍 Current branch: $ORIGINAL_BRANCH"
+
+# Check if working directory is dirty and stash if needed
+STASHED=false
+if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+    echo "🗃️  Stashing uncommitted changes..."
+    git stash
+    STASHED=true
+else
+    echo "✨ Working directory is clean, no need to stash"
+fi
+
+echo "🔍 Getting default branch..."
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+echo "   Default branch is: $DEFAULT_BRANCH"
+
+echo "🔄 Checking out and pulling latest $DEFAULT_BRANCH..."
+git checkout "$DEFAULT_BRANCH"
+git pull origin "$DEFAULT_BRANCH"
+
+echo "📅 Creating new branch..."
+BRANCH_NAME="empty-$(date +%Y%m%d-%H%M)"
+git checkout -b "$BRANCH_NAME"
+echo "   Created branch: $BRANCH_NAME"
+
+echo "📝 Creating empty commit..."
+git commit --allow-empty -m "Empty commit"
+
+echo "⬆️  Pushing branch to origin..."
+git push -u origin "$BRANCH_NAME"
+
+echo "🔀 Creating pull request..."
+gh pr create --fill
+
+echo "🌐 Opening PR in browser..."
+gh pr view --web
+
+echo "🔙 Switching back to $ORIGINAL_BRANCH..."
+git checkout "$ORIGINAL_BRANCH"
+
+# Pop stash if we stashed earlier
+if [ "$STASHED" = true ]; then
+    echo "📤 Popping stashed changes..."
+    git stash pop
+fi
+
+echo "✅ Done!"

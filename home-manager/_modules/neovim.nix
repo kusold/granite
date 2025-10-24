@@ -1,12 +1,7 @@
 {
-  config,
-  lib,
   pkgs,
-  gui,
-  darwin,
-  inputs,
   ...
-}@args:
+}:
 {
   programs.neovim = {
     enable = true;

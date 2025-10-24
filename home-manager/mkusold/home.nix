@@ -21,6 +21,8 @@
 
   home.stateVersion = "24.05";
 
+
+
   home.packages = [
     pkgs.aws-sam-cli
     pkgs.awscli2
@@ -28,15 +30,18 @@
     pkgs.direnv
     pkgs.docker-compose
     pkgs.gnupg
-    pkgs.jdk
+    pkgs.jdk23
+    pkgs.jq
     pkgs.k9s
     pkgs.kubernetes-helm
     pkgs.mas
     pkgs.maven
+    pkgs.opentofu
     pkgs.ponysay
     pkgs.restic
     pkgs.shellcheck
     pkgs.sqlite
+    pkgs.yq
 
     # Added while trying to get neovim working well
     pkgs.gnumake

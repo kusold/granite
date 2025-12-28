@@ -32,7 +32,6 @@
       gitleaks
       go-migrate
       go-task
-      golangci-lint
       goose-cli
       htop
       jq
@@ -65,7 +64,7 @@
 
       go # language:go
       ruby # language:ruby
-      nodejs # language:javascript
+      nodejs_24 # language:javascript
       python3 # language:python
       poetry # language:python
       uv # language:python

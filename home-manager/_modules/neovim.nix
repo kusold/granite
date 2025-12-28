@@ -16,7 +16,7 @@
     gcc
     gnumake
     go
-    nodejs_20
+    # nodejs
     unzip
   ];
 

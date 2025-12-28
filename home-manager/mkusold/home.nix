@@ -46,7 +46,7 @@
     # Added while trying to get neovim working well
     pkgs.gnumake
     pkgs.gcc
-    pkgs.nodejs_20
+    pkgs.nodejs
     pkgs.unzip
     pkgs.go
     #    ]

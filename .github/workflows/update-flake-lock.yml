@@ -1,0 +1,22 @@
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # Run daily at 6 AM UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Update flake.lock
+        uses: DeterminateSystems/update-flake-lock@main
+        with:
+          pr-title: "chore(deps): update flake.lock"
+          pr-labels: dependencies

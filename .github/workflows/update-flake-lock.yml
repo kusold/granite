@@ -21,7 +21,17 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Update flake.lock
+        id: update
         uses: DeterminateSystems/update-flake-lock@main
         with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           pr-title: "chore(deps): update flake.lock"
-          pr-labels: dependencies
+          pr-labels: |
+            dependencies
+            automerge
+
+      - name: Enable auto-merge
+        if: ${{ steps.update.outputs.pull-request-number != '' }}
+        run: gh pr merge --auto "${{ steps.update.outputs.pull-request-number }}" --squash
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_FOR_UPDATES }}

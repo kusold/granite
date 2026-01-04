@@ -31,7 +31,7 @@ jobs:
             automerge
 
       - name: Enable auto-merge
-        if: ${{ steps.update.outputs.pull-request-number != '' }}
-        run: gh pr merge --auto "${{ steps.update.outputs.pull-request-number }}" --squash
+        if: ${{ steps.update.outputs.pull-request-number }}
+        run: gh pr merge --auto ${{ steps.update.outputs.pull-request-number }} --squash
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_FOR_UPDATES }}

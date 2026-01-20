@@ -16,3 +16,12 @@ jobs:
 
       - name: Run flake check
         run: nix flake check
+
+      - name: Check formatting
+        run: nix fmt -- --check .
+
+      - name: Build home-manager configurations
+        run: |
+          nix build .#homeConfigurations.mike.activationPackage --dry-run
+          nix build .#homeConfigurations.mkusold.activationPackage --dry-run
+          nix build '.#homeConfigurations."mike@Mac.int.rockymtn.org".activationPackage' --dry-run

@@ -77,12 +77,6 @@
               system = "aarch64-darwin";
             };
 
-            # mkusold's configurations
-            "mkusold@Mikes-MacBook-Pro.local" = mkHome {
-              username = "mkusold";
-              system = "aarch64-darwin";
-            };
-
             # Fallback configurations (when hostname doesn't match)
             "mike" = mkHome {
               username = "mike";
@@ -90,7 +84,7 @@
             };
             "mkusold" = mkHome {
               username = "mkusold";
-              system = "x86_64-linux";
+              system = "aarch64-darwin";
             };
           };
       };

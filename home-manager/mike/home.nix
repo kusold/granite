@@ -13,7 +13,7 @@
     # ++ lib.optionals darwin [
     #   (import ../_modules/darwin.nix args)
   ];
-  home.stateVersion = "25.05";
+  home.stateVersion = "25.11";
   # nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.allowUnfreePredicate = _: true;
 
@@ -71,9 +71,10 @@
       cargo # language:rust
       rustc # language:rust
     ])
+    # Packages from unstable channel
     ++ (with pkgs-unstable; [
-      opencode
-      yt-dlp
+      opencode # fast-moving project, want bleeding edge
+      yt-dlp # needs frequent updates for site compatibility
     ]);
 
   programs.home-manager.enable = true;

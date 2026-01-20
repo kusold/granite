@@ -2,7 +2,7 @@
   config,
   lib,
   pkgs,
-  #  pkgs-unstable,
+  pkgs-unstable,
   #  gui,
   #  darwin,
   inputs,
@@ -19,18 +19,19 @@
     #      (import ../_modules/darwin.nix args)
   ];
 
-  home.stateVersion = "24.05";
+  home.stateVersion = "25.11";
 
 
 
   home.packages = [
-    pkgs.aws-sam-cli
+    # unstable isn't needed, but stable has build failures
+    pkgs-unstable.aws-sam-cli
     pkgs.awscli2
     pkgs.bat
     pkgs.direnv
     pkgs.docker-compose
     pkgs.gnupg
-    pkgs.jdk23
+    pkgs.jdk25
     pkgs.jq
     pkgs.k9s
     pkgs.kubernetes-helm

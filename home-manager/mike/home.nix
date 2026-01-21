@@ -1,6 +1,7 @@
 {
   pkgs,
   pkgs-unstable,
+  inputs,
   ...
 }@args:
 {
@@ -14,8 +15,10 @@
     #   (import ../_modules/darwin.nix args)
   ];
   home.stateVersion = "25.11";
-  # nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.allowUnfreePredicate = _: true;
+
+  nixpkgs.overlays = [ inputs.claude-code.overlays.default ];
 
   home.packages =
     (with pkgs; [
@@ -70,6 +73,8 @@
       uv # language:python
       cargo # language:rust
       rustc # language:rust
+
+      pkgs.claude-code
     ])
     # Packages from unstable channel
     ++ (with pkgs-unstable; [

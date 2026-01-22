@@ -9,13 +9,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-utils.url = "github:numtide/flake-utils";
     claude-code = {
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.flake-utils.follows = "flake-utils";
     };
     beads = {
       url = "github:steveyegge/beads";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.flake-utils.follows = "flake-utils";
     };
   };
 

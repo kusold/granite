@@ -15,10 +15,9 @@
     #   (import ../_modules/darwin.nix args)
   ];
   home.stateVersion = "25.11";
-  nixpkgs.config.allowUnfree = true;
-  # nixpkgs.config.allowUnfreePredicate = _: true;
-
-  nixpkgs.overlays = [ inputs.claude-code.overlays.default ];
+  # NOTE: nixpkgs.config and nixpkgs.overlays are NOT set here.
+  # When used with useGlobalPkgs = true (e.g., rockymtn), they are ignored.
+  # For standalone use, the homeConfiguration in flake.nix applies them.
 
   home.packages =
     (with pkgs; [
@@ -74,7 +73,9 @@
       cargo # language:rust
       rustc # language:rust
 
-      pkgs.claude-code
+      # From Overlays
+      claude-code
+      beads-with-completions
     ])
     # Packages from unstable channel
     ++ (with pkgs-unstable; [

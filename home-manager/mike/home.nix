@@ -75,7 +75,7 @@
 
       # From Overlays
       claude-code
-      beads-with-completions
+      beads
     ])
     # Packages from unstable channel
     ++ (with pkgs-unstable; [

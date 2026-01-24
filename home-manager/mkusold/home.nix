@@ -50,6 +50,10 @@
     pkgs.nodejs
     pkgs.unzip
     pkgs.go
+
+    # AI
+    pkgs.beads
+    pkgs.dolt
     #    ]
     #    ++ lib.optionals gui [
     #      pkgs-unstable.jetbrains.idea-ultimate

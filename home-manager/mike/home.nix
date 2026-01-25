@@ -30,6 +30,7 @@
       exiftool
       fdupes
       gh
+      git
       git-filter-repo
       gitleaks
       go-migrate

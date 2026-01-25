@@ -21,8 +21,4 @@
       . $ZDOTDIR/.zshrc
     '';
   };
-  home.file."./.config/zsh/" = {
-    source = ../../config/zsh;
-    recursive = true;
-  };
 }

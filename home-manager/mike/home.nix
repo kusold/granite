@@ -101,9 +101,4 @@
   #     confirm_os_window_close = 0;
   #   };
   # };
-
-  home.file."./bin/" = {
-    source = ../../bin;
-    recursive = true;
-  };
 }

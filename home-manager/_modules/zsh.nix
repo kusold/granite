@@ -14,10 +14,9 @@
     #dotDir = ".config/zsh";
     initContent = lib.mkBefore ''
       export ZDOTDIR=''${ZDOTDIR:-~/.config/zsh}
-    #   export ZDOTDIR=~/.config/zsh
-    #   . $ZDOTDIR/.zshenv
-    #   . $ZDOTDIR/.zlogin
-    #   . $ZDOTDIR/.zprofile
+      . ''${ZDOTDIR}/.zshenv
+      . ''${ZDOTDIR}/.zlogin
+      . ''${ZDOTDIR}/.zprofile
 
       . ''${ZDOTDIR}/.zshrc
     '';

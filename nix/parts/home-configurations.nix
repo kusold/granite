@@ -9,5 +9,6 @@
   flake.homeModules = {
     mike = ../../home-manager/mike/home.nix;
     mkusold = ../../home-manager/mkusold/home.nix;
+    clawdbot = ../../home-manager/_modules/clawdbot.nix;
   };
 }

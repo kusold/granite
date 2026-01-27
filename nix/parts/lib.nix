@@ -8,6 +8,7 @@
         system,
         homeDirectory ?
           if builtins.match ".*-darwin" system != null then "/Users/${username}" else "/home/${username}",
+        extraModules ? [ ],
       }:
       inputs.home-manager.lib.homeManagerConfiguration {
         pkgs = import inputs.nixpkgs {
@@ -22,13 +23,15 @@
             config.allowUnfree = true;
           };
         };
-        modules = [
-          self.homeModules.${username}
-          {
-            home.username = username;
-            home.homeDirectory = homeDirectory;
-          }
-        ];
+        modules =
+          [
+            self.homeModules.${username}
+            {
+              home.username = username;
+              home.homeDirectory = homeDirectory;
+            }
+          ]
+          ++ extraModules;
       };
   };
 }

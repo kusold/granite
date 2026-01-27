@@ -20,6 +20,12 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.flake-utils.follows = "flake-utils";
     };
+    nix-clawdbot = {
+      url = "github:clawdbot/nix-clawdbot";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs =

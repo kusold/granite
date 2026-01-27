@@ -3,6 +3,7 @@
   imports = [
     ./overlays/claude-code.nix
     ./overlays/beads.nix
+    ./overlays/nix-clawdbot.nix
     # Add more overlay modules here
   ];
 

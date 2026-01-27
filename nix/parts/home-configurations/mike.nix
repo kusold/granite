@@ -5,21 +5,20 @@
     "mike@Mac.int.rockymtn.org" = self.lib.mkHome {
       username = "mike";
       system = "aarch64-darwin";
+      homeModule = self.homeModules.mike;
     };
 
     "mike@dev" = self.lib.mkHome {
       username = "mike";
       system = "x86_64-linux";
-      extraModules = [
-        self.homeModules.clawdbot
-        self.inputs.nix-clawdbot.homeManagerModules.clawdbot
-      ];
+      homeModule = self.homeModules.mike-dev;
     };
 
     # Fallback configuration (when hostname doesn't match)
     "mike" = self.lib.mkHome {
       username = "mike";
       system = "x86_64-linux";
+      homeModule = self.homeModules.mike;
     };
   };
 }

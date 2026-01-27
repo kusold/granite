@@ -3,16 +3,16 @@
   pkgs-unstable,
   inputs,
   ...
-}@args:
+}:
 {
   imports = [
-    ../_modules/common.nix
-    ../_modules/git.nix
-    ../_modules/neovim.nix
-    ../_modules/zsh.nix
+    inputs.self.homeModules.common
+    inputs.self.homeModules.git
+    inputs.self.homeModules.neovim
+    inputs.self.homeModules.zsh
     # ]
     # ++ lib.optionals darwin [
-    #   (import ../_modules/darwin.nix args)
+    #   (import ../../_modules/darwin.nix args)
   ];
   home.stateVersion = "25.11";
   # NOTE: nixpkgs.config and nixpkgs.overlays are NOT set here.

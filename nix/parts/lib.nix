@@ -8,6 +8,7 @@
         system,
         homeDirectory ?
           if builtins.match ".*-darwin" system != null then "/Users/${username}" else "/home/${username}",
+        homeModule ? self.homeModules.${username},
         extraModules ? [ ],
       }:
       inputs.home-manager.lib.homeManagerConfiguration {
@@ -25,7 +26,7 @@
         };
         modules =
           [
-            self.homeModules.${username}
+            homeModule
             {
               home.username = username;
               home.homeDirectory = homeDirectory;

@@ -12,6 +12,7 @@
       username = "mike";
       system = "x86_64-linux";
       homeModule = self.homeModules.mike-dev;
+      extraModules = [ self.homeModules.clawdbot-external ];
     };
 
     # Fallback configuration (when hostname doesn't match)

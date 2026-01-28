@@ -1,3 +1,4 @@
+{ inputs, ... }:
 {
   imports = [
     ./home-configurations/mike.nix
@@ -19,6 +20,7 @@
     mkusold = ../../home-manager/users/mkusold/default.nix;
     # Shared modules
     clawdbot = ../../home-manager/_modules/clawdbot.nix;
+    clawdbot-external = inputs.nix-clawdbot.homeManagerModules.clawdbot;
     common = ../../home-manager/_modules/common.nix;
     git = ../../home-manager/_modules/git.nix;
     neovim = ../../home-manager/_modules/neovim.nix;

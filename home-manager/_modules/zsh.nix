@@ -4,7 +4,6 @@
   pkgs,
   gui,
   darwin,
-  inputs,
   ...
 }@args:
 {

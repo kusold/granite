@@ -1,7 +1,7 @@
 { inputs, ... }: {
   imports = [
-    inputs.self.homeModules.mike
+    ./mike.nix
     inputs.nix-clawdbot.homeManagerModules.clawdbot
-    inputs.self.homeModules.clawdbot
+    ../../_modules/clawdbot.nix
   ];
 }

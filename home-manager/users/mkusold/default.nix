@@ -10,10 +10,10 @@
 }:
 {
   imports = [
-    inputs.self.homeModules.common
-    inputs.self.homeModules.git
-    inputs.self.homeModules.neovim
-    inputs.self.homeModules.zsh
+    ../../_modules/common.nix
+    ../../_modules/git.nix
+    ../../_modules/neovim.nix
+    ../../_modules/zsh.nix
     #    ]
     #    ++ lib.optionals darwin [
     #      (import ../../_modules/darwin.nix args)

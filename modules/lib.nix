@@ -1,3 +1,4 @@
+# Provides flake.lib utilities, including mkHome for standalone home-manager configurations
 { inputs, self, ... }:
 {
   flake.lib = {
@@ -8,7 +9,7 @@
         system,
         homeDirectory ?
           if builtins.match ".*-darwin" system != null then "/Users/${username}" else "/home/${username}",
-        homeModule ? self.homeModules.${username},
+        homeModule ? self.modules.homeManager.${username},
         extraModules ? [ ],
       }:
       inputs.home-manager.lib.homeManagerConfiguration {

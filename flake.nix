@@ -10,6 +10,7 @@
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-utils.url = "github:numtide/flake-utils";
+    import-tree.url = "github:vic/import-tree";
     claude-code = {
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -29,22 +30,8 @@
   };
 
   outputs =
-    inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [
-        "aarch64-linux"
-        "i686-linux"
-        "x86_64-linux"
-        "aarch64-darwin"
-        "x86_64-darwin"
-      ];
-
-      imports = [
-        inputs.home-manager.flakeModules.home-manager
-        ./nix/parts/lib.nix
-        ./nix/parts/formatter.nix
-        ./nix/parts/overlays.nix
-        ./nix/parts/home-configurations.nix
-      ];
-    };
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; }
+      # Dendritic pattern: import all modules from ./modules using import-tree
+      (inputs.import-tree ./modules);
 }

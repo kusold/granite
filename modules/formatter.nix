@@ -1,3 +1,4 @@
+# Configures the nix formatter for this flake
 { inputs, ... }:
 {
   perSystem =

@@ -25,15 +25,14 @@
             config.allowUnfree = true;
           };
         };
-        modules =
-          [
-            homeModule
-            {
-              home.username = username;
-              home.homeDirectory = homeDirectory;
-            }
-          ]
-          ++ extraModules;
+        modules = [
+          homeModule
+          {
+            home.username = username;
+            home.homeDirectory = homeDirectory;
+          }
+        ]
+        ++ extraModules;
       };
   };
 }

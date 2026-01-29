@@ -6,18 +6,20 @@ let
   localModules = config.flake.modules.homeManager;
 in
 {
-  flake.modules.homeManager.clawdbot = { ... }: {
-    imports = [
-      # Import the module that defines programs.clawdbot options
-      localModules.clawdbot-external
-    ];
+  flake.modules.homeManager.clawdbot =
+    { ... }:
+    {
+      imports = [
+        # Import the module that defines programs.clawdbot options
+        localModules.clawdbot-external
+      ];
 
-    programs.clawdbot = {
-      enable = true;
-      # Set documents to null to skip the file existence checks
-      # You can configure AGENTS.md, SOUL.md, and TOOLS.md manually later
-      documents = null;
-      instances.default.enable = true;
+      programs.clawdbot = {
+        enable = true;
+        # Set documents to null to skip the file existence checks
+        # You can configure AGENTS.md, SOUL.md, and TOOLS.md manually later
+        documents = null;
+        instances.default.enable = true;
+      };
     };
-  };
 }

@@ -1,6 +1,6 @@
-# Overlay for nix-clawdbot
-# Input defined in flake.nix: inputs.nix-clawdbot
+# Overlay for nix-moltbot
+# Input defined in flake.nix: inputs.nix-moltbot
 { inputs, ... }:
 {
-  flake.overlays.nix-clawdbot = inputs.nix-clawdbot.overlays.default;
+  flake.overlays.nix-moltbot = inputs.nix-moltbot.overlays.default;
 }

@@ -40,16 +40,16 @@ granite/
     │   ├── compose.nix                 # Composes all overlays into default
     │   ├── claude-code.nix
     │   ├── beads.nix
-    │   └── nix-clawdbot.nix
+    │   └── nix-moltbot.nix
     └── home/
         ├── common.nix                  # exports flake.modules.homeManager.common
         ├── git.nix                     # exports flake.modules.homeManager.git
         ├── neovim.nix
         ├── zsh.nix
-        ├── clawdbot.nix
+        ├── moltbot.nix
         ├── darwin.nix
         ├── mike.nix                    # imports common, git, neovim, zsh
-        ├── mike-dev.nix                # imports mike + clawdbot
+        ├── mike-dev.nix                # imports mike + moltbot
         ├── mkusold.nix
         ├── modules.nix                 # External modules + homeModules backward compat
         └── configurations.nix          # flake.homeConfigurations.*
@@ -115,7 +115,7 @@ in
   flake.modules.homeManager.mike-dev = { ... }: {
     imports = [
       localModules.mike
-      localModules.clawdbot
+      localModules.moltbot
     ];
   };
 }
@@ -142,7 +142,7 @@ The `flake.modules.homeManager.*` exports include `_class = "homeManager"` metad
 - `homeModules.*` - Same modules, for backward compatibility  
 - `homeConfigurations.*` - Standalone home-manager configurations
 - `overlays.default` - Combined overlay with all packages
-- `overlays.{beads,claude-code,nix-clawdbot}` - Individual overlays
+- `overlays.{beads,claude-code,nix-moltbot}` - Individual overlays
 - `lib.mkHome` - Helper to create standalone home-manager configs
 
 ## References

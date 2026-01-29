@@ -21,8 +21,8 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.flake-utils.follows = "flake-utils";
     };
-    nix-clawdbot = {
-      url = "github:clawdbot/nix-clawdbot";
+    nix-moltbot = {
+      url = "github:moltbot/nix-moltbot";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.flake-utils.follows = "flake-utils";
       inputs.home-manager.follows = "home-manager";

@@ -3,8 +3,8 @@
 # This file handles external modules and the homeModules backward-compat alias
 { inputs, config, ... }:
 {
-  # Re-export external module from nix-clawdbot
-  flake.modules.homeManager.clawdbot-external = inputs.nix-clawdbot.homeManagerModules.clawdbot;
+  # Re-export external module from nix-moltbot
+  flake.modules.homeManager.moltbot-external = inputs.nix-moltbot.homeManagerModules.moltbot;
 
   # Backward compatible exports via homeModules
   flake.homeModules = config.flake.modules.homeManager;

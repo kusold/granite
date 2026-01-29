@@ -14,7 +14,7 @@
       username = "mike";
       system = "x86_64-linux";
       homeModule = self.modules.homeManager.mike-dev;
-      # extraModules = [ self.modules.homeManager.clawdbot-external ];
+      # extraModules = [ self.modules.homeManager.moltbot-external ];
     };
 
     # Fallback configuration (when hostname doesn't match)

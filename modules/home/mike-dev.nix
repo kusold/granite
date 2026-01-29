@@ -1,4 +1,4 @@
-# Mike's dev configuration (with clawdbot)
+# Mike's dev configuration (with moltbot)
 # Exports: flake.modules.homeManager.mike-dev
 { config, ... }:
 let
@@ -10,7 +10,7 @@ in
     {
       imports = [
         localModules.mike
-        localModules.clawdbot
+        localModules.moltbot
       ];
     };
 }

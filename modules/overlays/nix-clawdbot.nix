@@ -1,6 +1,6 @@
-# Overlay for nix-moltbot
-# Input defined in flake.nix: inputs.nix-moltbot
+# Overlay for llm-agents
+# Input defined in flake.nix: inputs.llm-agents
 { inputs, ... }:
 {
-  flake.overlays.nix-moltbot = inputs.nix-moltbot.overlays.default;
+  flake.overlays.llm-agents = inputs.llm-agents.overlays.default;
 }

@@ -73,12 +73,12 @@ in
           rustc # language:rust
 
           # From Overlays
-          claude-code
-          beads
+          llm-agents.claude-code
+          llm-agents.opencode
+          llm-agents.beads
         ])
         # Packages from unstable channel
         ++ (with pkgs-unstable; [
-          opencode # fast-moving project, want bleeding edge
           yt-dlp # needs frequent updates for site compatibility
         ]);
 

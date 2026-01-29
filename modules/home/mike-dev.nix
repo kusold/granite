@@ -6,12 +6,15 @@ let
 in
 {
   flake.modules.homeManager.mike-dev =
-    { ... }:
+    { pkgs, ... }:
     {
       imports = [
         localModules.mike
-				# Currently the nix module is broken
-        # localModules.moltbot
+      ];
+
+      home.packages = with pkgs; [
+        llm-agents.moltbot
+        bun
       ];
     };
 }

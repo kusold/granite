@@ -11,21 +11,10 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-utils.url = "github:numtide/flake-utils";
     import-tree.url = "github:vic/import-tree";
-    claude-code = {
-      url = "github:sadjow/claude-code-nix";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-    beads = {
-      url = "github:steveyegge/beads/v0.49.1";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-    nix-moltbot = {
-      url = "github:moltbot/nix-moltbot";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.flake-utils.follows = "flake-utils";
-      inputs.home-manager.follows = "home-manager";
+      inputs.blueprint.inputs.systems.follows = "flake-utils/systems";
     };
   };
 

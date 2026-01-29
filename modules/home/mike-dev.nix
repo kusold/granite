@@ -10,7 +10,8 @@ in
     {
       imports = [
         localModules.mike
-        localModules.moltbot
+				# Currently the nix module is broken
+        # localModules.moltbot
       ];
     };
 }

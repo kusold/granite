@@ -17,7 +17,7 @@
       inputs.flake-utils.follows = "flake-utils";
     };
     beads = {
-      url = "github:steveyegge/beads";
+      url = "github:steveyegge/beads/v0.49.1";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.flake-utils.follows = "flake-utils";
     };

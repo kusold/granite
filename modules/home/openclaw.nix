@@ -31,6 +31,7 @@ in
       # Systemd user service for openclaw gateway
       # See: https://docs.molt.bot/gateway#supervision-systemd-user-unit
       systemd.user.services.openclaw-gateway = {
+        enable = true;
         Unit = {
           Description = "OpenClaw Gateway (profile: default)";
           After = [ "network-online.target" ];

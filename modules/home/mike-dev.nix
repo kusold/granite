@@ -1,4 +1,4 @@
-# Mike's dev configuration (with moltbot)
+# Mike's dev configuration (with openclaw)
 # Exports: flake.modules.homeManager.mike-dev
 { config, ... }:
 let
@@ -13,7 +13,7 @@ in
       ];
 
       home.packages = with pkgs; [
-        llm-agents.moltbot
+        llm-agents.openclaw
         bun
       ];
     };

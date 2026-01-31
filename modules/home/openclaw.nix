@@ -7,7 +7,7 @@ let
 in
 {
   flake.modules.homeManager.openclaw =
-    { ... }:
+    { pkgs, ... }:
     {
       imports = [
         # Import the module that defines programs.openclaw options
@@ -49,6 +49,29 @@ in
 
         Install = {
           WantedBy = [ "default.target" ];
+        };
+      };
+
+      # Systemd user service for signal-cli in HTTP JSON-RPC mode
+      # Starts automatically with openclaw-gateway
+      # See: https://github.com/AsamK/signal-cli/blob/master/man/signal-cli-jsonrpc.5.adoc
+      systemd.user.services.signal-cli-jsonrpc = {
+        enable = true;
+        Unit = {
+          Description = "Signal CLI JSON-RPC HTTP daemon";
+          After = [ "openclaw-gateway.service" "network-online.target" ];
+          Wants = [ "openclaw-gateway.service" "network-online.target" ];
+        };
+
+        Service = {
+          ExecStart = "${pkgs.signal-cli}/bin/signal-cli daemon --http=:8080";
+          Restart = "always";
+          RestartSec = 5;
+          WorkingDirectory = config.home.homeDirectory;
+        };
+
+        Install = {
+          WantedBy = [ "openclaw-gateway.service" ];
         };
       };
     };

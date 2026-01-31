@@ -17,6 +17,7 @@ in
       home.packages = with pkgs; [
         llm-agents.openclaw
         bun
+        signal-cli
       ];
     };
 }

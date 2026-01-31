@@ -77,6 +77,7 @@ in
           llm-agents.opencode
           llm-agents.beads
           llm-agents.amp
+          llm-agents.gemini-cli
         ])
         # Packages from unstable channel
         ++ (with pkgs-unstable; [

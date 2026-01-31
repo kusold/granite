@@ -76,6 +76,7 @@ in
           llm-agents.claude-code
           llm-agents.opencode
           llm-agents.beads
+          llm-agents.amp
         ])
         # Packages from unstable channel
         ++ (with pkgs-unstable; [

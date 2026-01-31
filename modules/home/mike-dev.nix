@@ -12,6 +12,8 @@ in
         localModules.mike
       ];
 
+      services.ssh-agent.enable = true;
+
       home.packages = with pkgs; [
         llm-agents.openclaw
         bun

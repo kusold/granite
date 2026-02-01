@@ -51,7 +51,7 @@ in
         };
 
         Install = {
-          WantedBy = [ "openclaw-gateway.service" ];
+          WantedBy = [ "default.target" ];
         };
       };
     };

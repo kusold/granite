@@ -7,7 +7,7 @@ let
 in
 {
   flake.modules.homeManager.openclaw =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     {
 
       # Systemd user service for openclaw gateway

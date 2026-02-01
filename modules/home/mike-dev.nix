@@ -10,6 +10,7 @@ in
     {
       imports = [
         localModules.mike
+				localModules.openclaw
       ];
 
       services.ssh-agent.enable = true;

@@ -9,24 +9,6 @@ in
   flake.modules.homeManager.openclaw =
     { pkgs, ... }:
     {
-      imports = [
-        # Import the module that defines programs.openclaw options
-        localModules.openclaw-external
-      ];
-
-      programs.openclaw = {
-        enable = true;
-        # Set documents to null to skip the file existence checks
-        # You can configure AGENTS.md, SOUL.md, and TOOLS.md manually later
-        documents = null;
-        instances.default.enable = true;
-
-        # Causes trouble on linux as of Jan 28, 2026
-        firstParty = {
-          peekaboo.enable = false;
-          summarize.enable = false;
-        };
-      };
 
       # Systemd user service for openclaw gateway
       # See: https://docs.molt.bot/gateway#supervision-systemd-user-unit

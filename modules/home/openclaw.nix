@@ -13,7 +13,6 @@ in
       # Systemd user service for openclaw gateway
       # See: https://docs.molt.bot/gateway#supervision-systemd-user-unit
       systemd.user.services.openclaw-gateway = {
-        enable = true;
         Unit = {
           Description = "OpenClaw Gateway (profile: default)";
           After = [ "network-online.target" ];
@@ -21,7 +20,7 @@ in
         };
 
         Service = {
-          ExecStart = "${config.programs.openclaw.package}/bin/openclaw gateway --port 18789";
+          ExecStart = "${pkgs.llm-agents.openclaw}/bin/openclaw gateway --port 18789";
           Restart = "always";
           RestartSec = 5;
           # Environment variables can be set here if needed
@@ -38,7 +37,6 @@ in
       # Starts automatically with openclaw-gateway
       # See: https://github.com/AsamK/signal-cli/blob/master/man/signal-cli-jsonrpc.5.adoc
       systemd.user.services.signal-cli-jsonrpc = {
-        enable = true;
         Unit = {
           Description = "Signal CLI JSON-RPC HTTP daemon";
           After = [ "openclaw-gateway.service" "network-online.target" ];

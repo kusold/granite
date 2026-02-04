@@ -2,7 +2,8 @@ name: Update flake.lock
 
 on:
   schedule:
-    - cron: "0 6 * * *" # Run daily at 6 AM UTC
+    - cron: "0 0,12 * * *" # Run twice daily at midnight and noon UTC
+    - cron: "0 0 * * 0" # Run weekly on Sunday at midnight UTC
   workflow_dispatch: # Allow manual trigger
     inputs:
       inputs:
@@ -11,7 +12,59 @@ on:
         default: ""
 
 jobs:
-  update:
+  update-llm-agents:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 0,12 * * *'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Update llm-agents input
+        run: nix flake lock --update-input llm-agents
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.lock
+          git commit -m "chore(deps): update llm-agents input"
+          git push
+
+  update-others:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 0 * * 0'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Update other inputs
+        run: |
+          for input in nixpkgs nixpkgs-unstable home-manager flake-parts flake-utils import-tree; do
+            nix flake lock --update-input "$input"
+          done
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.lock
+          git commit -m "chore(deps): update flake inputs"
+          git push
+
+  update-manual:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write

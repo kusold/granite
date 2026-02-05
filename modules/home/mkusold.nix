@@ -12,6 +12,7 @@ in
         localModules.common
         localModules.git
         localModules.neovim
+        localModules.yadm
         localModules.zsh
       ];
 

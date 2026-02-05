@@ -46,8 +46,9 @@ in
         pkgs.go
 
         # AI
-        pkgs.beads
+        pkgs.llm-agents.beads
         pkgs.dolt
+        pkgs.llm-agents.openspec
       ];
 
       programs.home-manager.enable = true;

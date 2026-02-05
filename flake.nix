@@ -14,7 +14,6 @@
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.blueprint.inputs.systems.follows = "flake-utils/systems";
     };
   };
 

@@ -73,7 +73,11 @@ in
           rustc # language:rust
 
           # From Overlays
+          llm-agents.ccusage
+          llm-agents.ccusage-codex
           llm-agents.claude-code
+          llm-agents.codex
+          llm-agents.happy-coder
           llm-agents.opencode
           llm-agents.beads
           llm-agents.amp

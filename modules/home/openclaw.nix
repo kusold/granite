@@ -39,8 +39,14 @@ in
       systemd.user.services.signal-cli-jsonrpc = {
         Unit = {
           Description = "Signal CLI JSON-RPC HTTP daemon";
-          After = [ "openclaw-gateway.service" "network-online.target" ];
-          Wants = [ "openclaw-gateway.service" "network-online.target" ];
+          After = [
+            "openclaw-gateway.service"
+            "network-online.target"
+          ];
+          Wants = [
+            "openclaw-gateway.service"
+            "network-online.target"
+          ];
         };
 
         Service = {

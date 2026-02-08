@@ -19,7 +19,14 @@
 
   outputs =
     inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; }
-      # Dendritic pattern: import all modules from ./modules using import-tree
-      (inputs.import-tree ./modules);
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+      { config, ... }:
+      {
+        imports = [
+          # Dendritic pattern: import all modules from ./modules using import-tree
+          (inputs.import-tree ./modules)
+        ];
+
+      }
+    );
 }

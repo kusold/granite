@@ -20,13 +20,23 @@
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
-      { config, ... }:
+      { config, self, ... }:
       {
         imports = [
           # Dendritic pattern: import all modules from ./modules using import-tree
           (inputs.import-tree ./modules)
         ];
 
+        # Configure perSystem to apply overlays
+        perSystem =
+          { config, system, ... }:
+          {
+            _module.args.pkgs = import inputs.nixpkgs {
+              inherit system;
+              overlays = [ self.overlays.default ];
+              config.allowUnfree = true;
+            };
+          };
       }
     );
 }

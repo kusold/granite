@@ -1,0 +1,16 @@
+# Pre-commit configuration using prek
+# See https://github.com/storebell/prek for configuration options
+#
+# To use: Run `nix develop` to enter the devshell, then run `prek run`
+# For git hooks, you'll need to install prek and nixfmt in your system
+
+repos:
+  - repo: local
+    hooks:
+      - id: nix-fmt
+        name: Format Nix files
+        entry: nixfmt
+        language: system
+        types: [nix]
+        files: '\.nix$'
+        description: Format Nix files using nixfmt

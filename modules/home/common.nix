@@ -26,6 +26,9 @@
         wget
         yadm
         yq
+
+        # From Overlays
+        llm-agents.ccstatusline
       ];
     };
 }

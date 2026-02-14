@@ -16,8 +16,15 @@ in
       services.ssh-agent.enable = true;
 
       home.packages = with pkgs; [
-        llm-agents.openclaw
         bun
+        # beads temporarily here because it's out of date in nix due to old golang
+        llm-agents.beads
+        llm-agents.amp
+        llm-agents.ccusage-codex
+        llm-agents.claude-code
+        llm-agents.codex
+        llm-agents.gemini-cli
+        llm-agents.openclaw
         signal-cli
       ];
     };

@@ -74,20 +74,20 @@ in
 
           # From Overlays
           llm-agents.ccusage
-          llm-agents.ccusage-codex
-          llm-agents.claude-code
-          llm-agents.codex
           llm-agents.happy-coder
           llm-agents.opencode
-          llm-agents.beads
-          llm-agents.amp
-          llm-agents.gemini-cli
           llm-agents.openspec
         ])
         # Packages from unstable channel
         ++ (with pkgs-unstable; [
           yt-dlp # needs frequent updates for site compatibility
         ]);
+
+        nix.package = pkgs.nix;
+        nix.settings = {
+          extra-substituters = [ "https://cache.numtide.com" ];
+          extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
+        };
 
       programs.home-manager.enable = true;
     };

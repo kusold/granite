@@ -7,14 +7,17 @@
     {
       programs.zsh = {
         enable = true;
-        initContent = lib.mkBefore ''
-          export ZDOTDIR=''${ZDOTDIR:-~/.config/zsh}
-          . ''${ZDOTDIR}/.zshenv
-          . ''${ZDOTDIR}/.zlogin
-          . ''${ZDOTDIR}/.zprofile
-
-          . ''${ZDOTDIR}/.zshrc
-        '';
+        completionInit = "";      # compinit handled by belak/zsh-utils in custom .zshrc
+        shellAliases = {};        # aliases handled in custom .zshrc
+        initContent = lib.mkMerge [
+          (lib.mkBefore ''
+            export ZDOTDIR=''${ZDOTDIR:-~/.config/zsh}
+            . ''${ZDOTDIR}/.zshenv
+          '')
+          (lib.mkAfter ''
+            . ''${ZDOTDIR}/.zshrc
+          '')
+        ];
       };
     };
 }

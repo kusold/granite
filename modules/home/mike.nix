@@ -22,48 +22,23 @@ in
           age # encryption tool
           ansible
           aspell
-          awscli2 # AWS CLI v2
-          bat # better cat
           bfg-repo-cleaner
           exiftool
           fdupes
-          gh
-          git
           git-filter-repo
           gitleaks
           go-migrate
           go-task
           goose-cli
-          htop
-          jq
           k3sup
-          k9s
           kompose
-          kubernetes-helm
           kustomize
           mosh
-          nixd # Nix LSP
-          nixpkgs-fmt
-          opentofu
-          ponysay
           pre-commit
-          restic
           resticprofile
-          ripgrep
-          rsync
-          shellcheck
           sops
-          sqlite
-          ssh-copy-id
-          tmux
-          tree
-          unar
-          vim
           wakeonlan
-          wget
-          yadm
 
-          go # language:go
           ruby # language:ruby
           nodejs_24 # language:javascript
           python3 # language:python
@@ -76,18 +51,11 @@ in
           llm-agents.ccusage
           llm-agents.happy-coder
           llm-agents.opencode
-          llm-agents.openspec
         ])
         # Packages from unstable channel
         ++ (with pkgs-unstable; [
           yt-dlp # needs frequent updates for site compatibility
         ]);
-
-        nix.package = pkgs.nix;
-        nix.settings = {
-          extra-substituters = [ "https://cache.numtide.com" ];
-          extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
-        };
 
       programs.home-manager.enable = true;
     };

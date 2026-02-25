@@ -1,11 +1,9 @@
 # Expose packages from overlays
-{ lib, ... }:
+{ ... }:
 {
-  perSystem =
-    { config, pkgs, ... }:
-    {
-      packages = {
-        inherit (pkgs) hapi;
-      };
+  perSystem = { pkgs, ... }: {
+    packages = {
+      inherit (pkgs) hapi;
     };
+  };
 }

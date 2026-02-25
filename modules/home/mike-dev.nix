@@ -10,6 +10,7 @@ in
     {
       imports = [
         localModules.mike
+        localModules.hapi
         localModules.openclaw
       ];
 

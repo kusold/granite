@@ -27,6 +27,7 @@
       home.packages = with pkgs; [
         awscli2
         btop
+		fzf
         gh
         git
         go
@@ -56,6 +57,7 @@
         llm-agents.ccstatusline
         llm-agents.ccusage
         llm-agents.openspec
+        llm-agents.qmd # mini cli search engine for markdown
       ];
     };
 }

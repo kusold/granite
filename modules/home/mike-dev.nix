@@ -18,7 +18,6 @@ in
 
       home.packages = with pkgs; [
         bun
-        sqlite-interactive
         llm-agents.beads
         llm-agents.amp
         llm-agents.ccusage-codex

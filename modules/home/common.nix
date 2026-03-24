@@ -41,7 +41,7 @@
         restic
         rsync
         shellcheck
-        sqlite
+        sqlite-interactive
         ssh-copy-id
         tmux
         tree

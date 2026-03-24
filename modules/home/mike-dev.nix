@@ -18,7 +18,7 @@ in
 
       home.packages = with pkgs; [
         bun
-        # beads temporarily here because it's out of date in nix due to old golang
+        sqlite-interactive
         llm-agents.beads
         llm-agents.amp
         llm-agents.ccusage-codex

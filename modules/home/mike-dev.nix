@@ -6,7 +6,7 @@ let
 in
 {
   flake.modules.homeManager.mike-dev =
-    { pkgs, ... }:
+    { pkgs, pkgs-unstable, ... }:
     {
       imports = [
         localModules.mike
@@ -16,16 +16,20 @@ in
 
       services.ssh-agent.enable = true;
 
-      home.packages = with pkgs; [
-        bun
-        llm-agents.beads
-        llm-agents.amp
-        llm-agents.ccusage-codex
-        llm-agents.claude-code
-        llm-agents.codex
-        llm-agents.gemini-cli
-        llm-agents.openclaw
-        signal-cli
-      ];
+      home.packages =
+        (with pkgs; [
+          bun
+          llm-agents.beads
+          llm-agents.amp
+          llm-agents.ccusage-codex
+          llm-agents.claude-code
+          llm-agents.codex
+          llm-agents.gemini-cli
+          llm-agents.openclaw
+          signal-cli
+        ])
+        ++ (with pkgs-unstable; [
+          vja
+        ]);
     };
 }

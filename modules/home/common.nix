@@ -1,11 +1,12 @@
 # Common home-manager configuration shared across all users
 # Exports: flake.modules.homeManager.common
+# Note: nix.package uses mkDefault so NixOS module can override it
 { ... }:
 {
   flake.modules.homeManager.common =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     {
-      nix.package = pkgs.nix;
+      nix.package = lib.mkOverride 1500 pkgs.nix;
 
       nix.settings = {
         extra-substituters = [ "https://cache.numtide.com" ];

@@ -1,12 +1,12 @@
 # Common home-manager configuration shared across all users
 # Exports: flake.modules.homeManager.common
-# Note: nix.package is not set here because home-manager's NixOS module
-# automatically forwards config.nix.package to each user's home-manager config.
 { ... }:
 {
   flake.modules.homeManager.common =
     { pkgs, ... }:
     {
+      nix.package = pkgs.nix;
+
       nix.settings = {
         extra-substituters = [ "https://cache.numtide.com" ];
         extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];

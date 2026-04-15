@@ -54,6 +54,7 @@ in
         ])
         # Packages from unstable channel
         ++ (with pkgs-unstable; [
+          vja
           yt-dlp # needs frequent updates for site compatibility
         ]);
 

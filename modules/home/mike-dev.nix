@@ -20,7 +20,7 @@ in
         bun
         llm-agents.beads
         llm-agents.amp
-        llm-agents.ccusage-codex
+        llm-agents.ccusage
         llm-agents.claude-code
         llm-agents.codex
         llm-agents.gemini-cli

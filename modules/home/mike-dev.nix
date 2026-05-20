@@ -19,11 +19,9 @@ in
       home.packages = with pkgs; [
         bun
         llm-agents.beads
-        llm-agents.amp
         llm-agents.ccusage
         llm-agents.claude-code
         llm-agents.codex
-        llm-agents.gemini-cli
         llm-agents.openclaw
         signal-cli
       ];

@@ -3,7 +3,7 @@
 { ... }:
 {
   flake.modules.homeManager.neovim =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     {
       programs.neovim = {
         enable = true;
@@ -13,11 +13,18 @@
         vimdiffAlias = true;
       };
 
+      # Let YADM manage init.lua instead of home-manager. The neovim module
+      # writes ~/.config/nvim/init.lua whenever it generates Lua config; disabling
+      # just this file leaves the path free for YADM to own.
+      xdg.configFile."nvim/init.lua".enable = lib.mkForce false;
+
       home.packages = with pkgs; [
         # Needed for various plugins to compile
         gcc
         gnumake
         go
+        # nvim-treesitter `main` branch builds parsers via the tree-sitter CLI
+        tree-sitter
         unzip
       ];
     };

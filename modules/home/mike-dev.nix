@@ -22,7 +22,6 @@ in
         llm-agents.ccusage
         llm-agents.claude-code
         llm-agents.codex
-        llm-agents.hermes-agent
         llm-agents.openclaw
         llm-agents.pi
         signal-cli

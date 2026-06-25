@@ -24,7 +24,6 @@ in
         llm-agents.codex
         llm-agents.openclaw
         llm-agents.pi
-        signal-cli
       ];
     };
 }

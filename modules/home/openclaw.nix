@@ -33,32 +33,9 @@ in
         };
       };
 
-      # Systemd user service for signal-cli in HTTP JSON-RPC mode
-      # Starts automatically with openclaw-gateway
-      # See: https://github.com/AsamK/signal-cli/blob/master/man/signal-cli-jsonrpc.5.adoc
-      systemd.user.services.signal-cli-jsonrpc = {
-        Unit = {
-          Description = "Signal CLI JSON-RPC HTTP daemon";
-          After = [
-            "openclaw-gateway.service"
-            "network-online.target"
-          ];
-          Wants = [
-            "openclaw-gateway.service"
-            "network-online.target"
-          ];
-        };
-
-        Service = {
-          ExecStart = "${pkgs.signal-cli}/bin/signal-cli daemon --http=:8080";
-          Restart = "always";
-          RestartSec = 5;
-          WorkingDirectory = config.home.homeDirectory;
-        };
-
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
-      };
+      # signal-cli is provided by the host (rockymtn's
+      # modules/services/signal-cli.nix) as a system service on 127.0.0.1:8080,
+      # shared with Hermes — both gateways use the same Signal account, so
+      # openclaw just points at the loopback endpoint.
     };
 }

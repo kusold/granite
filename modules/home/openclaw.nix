@@ -9,6 +9,9 @@ in
   flake.modules.homeManager.openclaw =
     { config, pkgs, ... }:
     {
+      home.packages = with pkgs; [
+				signal-cli
+			];
 
       # Systemd user service for openclaw gateway
       # See: https://docs.molt.bot/gateway#supervision-systemd-user-unit

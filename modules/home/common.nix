@@ -6,7 +6,15 @@
   flake.modules.homeManager.common =
     { lib, pkgs, ... }:
     {
-      nix.package = lib.mkOverride 1500 pkgs.nix;
+      # mkDefault (priority 1000) works in every context:
+      #  - standalone `home-manager switch`: provides pkgs.nix so the
+      #    "nix.package required to generate nix.conf" assertion is satisfied
+      #    (the option's own default is null at priority 1500, so this wins).
+      #  - imported via the home-manager NixOS/Darwin module: the OS-forwarded
+      #    nix.package (priority 100) overrides this, so there is no collision.
+      # Do NOT use mkOverride 1500 — that ties home-manager's null default
+      # (also 1500) and triggers "defined both null and not null".
+      nix.package = lib.mkDefault pkgs.nix;
 
       nix.settings = {
         extra-substituters = [ "https://cache.numtide.com" ];

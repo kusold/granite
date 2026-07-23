@@ -11,10 +11,23 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-utils.url = "github:numtide/flake-utils";
     import-tree.url = "github:vic/import-tree";
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
+    # Deliberately NOT following nixpkgs. numtide publishes prebuilt store paths
+    # to cache.numtide.com built against its OWN pinned nixpkgs-unstable rev.
+    # Following granite's nixpkgs-unstable rebuilds the nixpkgs-sensitive
+    # packages (notably opencode's fetchNpmDeps) against a different rev, so
+    # those paths miss the cache and build from source — the multi-GB npm build.
+    # Let llm-agents use its own nixpkgs so every package hits the cache.
+    # (Same reasoning as rockymtn's hermes-agent input.)
+    llm-agents.url = "github:numtide/llm-agents.nix";
+  };
+
+  # Declare the numtide binary cache so standalone granite builds (home-manager
+  # switch / nix build / laptops) consult cache.numtide.com. The rockymtn fleet
+  # sets this at the system level via its cache module; this covers the rest.
+  # Requires the consumer to accept flake config (accept-flake-config = true).
+  nixConfig = {
+    extra-substituters = [ "https://cache.numtide.com" ];
+    extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
   };
 
   outputs =

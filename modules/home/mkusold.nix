@@ -37,8 +37,6 @@ in
         pkgs.dolt
       ];
 
-      programs.home-manager.enable = true;
-
       home.file."./bin/" = {
         source = ../../bin;
         recursive = true;

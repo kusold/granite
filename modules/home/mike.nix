@@ -57,7 +57,5 @@ in
           vja
           yt-dlp # needs frequent updates for site compatibility
         ]);
-
-      programs.home-manager.enable = true;
     };
 }

@@ -16,6 +16,15 @@
       # (also 1500) and triggers "defined both null and not null".
       nix.package = lib.mkDefault pkgs.nix;
 
+      # Installs the home-manager CLI from the pinned flake input. Do NOT also add
+      # pkgs.home-manager to home.packages — that is a separate build tracking
+      # nixpkgs independently, so the two collide on bin/home-manager and can skew
+      # the CLI out of sync with the modules evaluating this config.
+      # No-op when imported as a NixOS/Darwin submodule (upstream gates it on
+      # !submoduleSupport.enable), so this is safe for external consumers.
+      # mkDefault so they can opt out with `= false` instead of mkForce.
+      programs.home-manager.enable = lib.mkDefault true;
+
       nix.settings = {
         extra-substituters = [ "https://cache.numtide.com" ];
         extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
@@ -40,7 +49,6 @@
         gh
         git
         go
-        home-manager
         k9s
         kubernetes-helm
         nixd # Nix LSP

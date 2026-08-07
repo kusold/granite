@@ -42,6 +42,10 @@
       programs.jq.enable = true;
       programs.ripgrep.enable = true;
 
+      # Shell integrations stay off (their default): they auto-start/auto-attach
+      # a session on every shell launch, same reason direnv's is off above.
+      programs.zellij.enable = true;
+
       home.packages = with pkgs; [
         awscli2
         btop

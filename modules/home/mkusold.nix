@@ -37,6 +37,15 @@ in
         pkgs.dolt
       ];
 
+      # gh is enabled in the shared git module; the host config is user-specific.
+      programs.gh.hosts = {
+        "github.marqeta.com" = {
+          git_protocol = "ssh";
+          users.mkusold = null;
+          user = "mkusold";
+        };
+      };
+
       home.file."./bin/" = {
         source = ../../bin;
         recursive = true;

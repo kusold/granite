@@ -27,6 +27,7 @@ in
         pkgs.jdk25
         pkgs.mas
         pkgs.maven
+        pkgs.python3
 
         # Added while trying to get neovim working well
         pkgs.gnumake

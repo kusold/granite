@@ -11,6 +11,10 @@
         viAlias = true;
         vimAlias = true;
         vimdiffAlias = true;
+        # No plugin here is a remote plugin, so neither host is ever called.
+        # Ruby in particular dragged ~800MiB into the closure.
+        withRuby = false;
+        withPython3 = false;
       };
 
       # Let YADM manage init.lua instead of home-manager. The neovim module

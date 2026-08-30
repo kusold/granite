@@ -26,6 +26,32 @@
       # Ghostty (one of Omarchy's supported terminals; their default is foot).
       xdg.configFile."ghostty/config".source = ../../config/ghostty/config;
 
+      # The Quickshell desktop shell. `quickshell` picks up
+      # ~/.config/quickshell/shell.qml by default.
+      xdg.configFile."quickshell" = {
+        source = ../../config/quickshell;
+        recursive = true;
+      };
+
+      # One shell instance per graphical session, like Omarchy's
+      # omarchy-launch-shell (which supervises theirs from Hyprland
+      # autostart; a systemd unit does the same job here).
+      systemd.user.services.quickshell = {
+        Unit = {
+          Description = "Quickshell desktop shell";
+          PartOf = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+        Service = {
+          ExecStart = "${pkgs.quickshell}/bin/quickshell";
+          Restart = "on-failure";
+          RestartSec = 1;
+        };
+        Install = {
+          WantedBy = [ "graphical-session.target" ];
+        };
+      };
+
       home.packages = with pkgs; [
         ghostty
         quickshell

@@ -307,9 +307,8 @@ end)
 
 launch_on_start("udiskie --automount --no-notify --no-tray")
 
--- Interim polkit agent until the quickshell shell grows its own plugin
--- (Omarchy Quattro runs its polkit agent inside Quickshell).
-launch_on_start("hyprpolkitagent")
+-- The polkit agent (hyprpolkitagent) runs as a systemd user service bound
+-- to graphical-session.target — see modules/home/hyprland.nix.
 
 -- Applications --------------------------------------------------------------
 

@@ -52,6 +52,25 @@
         };
       };
 
+      # Interim polkit agent until the quickshell shell grows its own plugin
+      # (Omarchy Quattro runs its polkit agent inside Quickshell). Modeled on
+      # the unit the nixpkgs package ships (libexec binary, session-scoped).
+      systemd.user.services.hyprpolkitagent = {
+        Unit = {
+          Description = "Hyprland Polkit Authentication Agent";
+          ConditionEnvironment = "WAYLAND_DISPLAY";
+          PartOf = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+        Service = {
+          ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";
+          Restart = "on-failure";
+        };
+        Install = {
+          WantedBy = [ "graphical-session.target" ];
+        };
+      };
+
       home.packages = with pkgs; [
         ghostty
         quickshell

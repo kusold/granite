@@ -235,6 +235,11 @@ hl.animation({ leaf = "workspaces", enabled = false })
 hl.layer_rule({ match = { namespace = "mike-launcher" }, no_anim = true, animation = "none" })
 hl.layer_rule({ match = { namespace = "mike-session" }, no_anim = true, animation = "none" })
 hl.layer_rule({ match = { namespace = "mike-clipboard" }, no_anim = true, animation = "none" })
+-- The background and screensaver surfaces join them: their crossfades are
+-- theirs, not the compositor's layer animations.
+hl.layer_rule({ match = { namespace = "mike-background" }, no_anim = true, animation = "none" })
+hl.layer_rule({ match = { namespace = "mike-background-picker" }, no_anim = true, animation = "none" })
+hl.layer_rule({ match = { namespace = "mike-screensaver" }, no_anim = true, animation = "none" })
 
 -- Window rules --------------------------------------------------------------
 -- https://wiki.hypr.land/Configuring/Basics/Window-Rules/
@@ -408,6 +413,13 @@ bind_cmd("CTRL + PRINT", "Screenshot region", [[sh -c 'grim -g "$(slurp)" - | te
 bind_cmd("SUPER + PRINT", "Color picker", "sh -c 'pkill hyprpicker || hyprpicker -a'")
 
 bind_cmd("SUPER + CTRL + N", "Toggle nightlight", "sh -c 'pkill hyprsunset || hyprsunset -t 4000'")
+
+-- The background switcher and screensaver (M6) live in the quickshell
+-- shell: SUPER+CTRL+SPACE opens the background picker (Omarchy Quattro's
+-- binding; a desktop double-click opens it too), SUPER+ESC starts the
+-- screensaver on demand (their System > Screensaver entry).
+bind_cmd("SUPER + CTRL + SPACE", "Background switcher", "qs ipc call background toggle")
+bind_cmd("SUPER + ESC", "Screensaver", "qs ipc call screensaver start")
 
 -- The quickshell shell is the notifications daemon (M2); qs ipc talks to it.
 bind_cmd("SUPER + N", "Toggle do-not-disturb", "qs ipc call notifications toggleDnd")

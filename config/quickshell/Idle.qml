@@ -4,6 +4,9 @@
 // minutes lock the session (Omarchy's default), thirty suspend it. The
 // display itself blanks five seconds after the lock engages or the last
 // lock-screen event — that lives in Lock.qml with the lock surface.
+// M6 adds the stage before these: Screensaver.qml's own monitor brings
+// the screensaver up at 150s (Omarchy's default), sharing the same idle
+// clock, so any activity resets all three at once.
 //
 // Locking happens in-process (the shell owns the lock), suspending goes
 // through systemctl (logind allows it for local active sessions without

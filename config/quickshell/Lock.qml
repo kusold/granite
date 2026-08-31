@@ -12,17 +12,19 @@
 // stranded compositor lock (shell crashed while locked; ext-session-lock
 // outlives its client) is detected via hyprctl and taken over so it can be
 // unlocked with the password. Still deliberately NOT here vs Omarchy:
-// fingerprint auth, the lock preview mode, and wallpaper blurring (there is
-// no wallpaper until M6) — the solid background matches granite's palette.
+// fingerprint auth and the lock preview mode.
 //
 // Driven by keybinds (`qs ipc call lock lock`), the idle timers (Idle.qml
 // and the session menu call beginLock() in-process), and suspend flows.
+// The M6 background is shown blurred behind the field (Omarchy's recipe);
+// the solid palette color stands in while it loads — or when there is none.
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Pam
 import Quickshell.Wayland
 import QtQuick
+import QtQuick.Effects
 
 Item {
   id: service
@@ -35,6 +37,14 @@ Item {
   readonly property color background: "#101014"
 
   readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME") || ""
+
+  // Wired to the shell's Background instance by shell.qml; the lock shows
+  // its current wallpaper blurred behind the field.
+  property var backgroundService: null
+
+  readonly property string wallpaperPath: backgroundService !== null
+    ? String(backgroundService.currentBackground || "")
+    : ""
 
   // Dots render at dotFontSize and shrink to fit; the placeholder renders
   // at fieldFontSize (Omarchy's sizes, scaled to granite's field).
@@ -269,6 +279,36 @@ Item {
       id: lockSurface
 
       color: service.background
+
+      // The current wallpaper, blurred (Omarchy's lock look). The image
+      // stays hidden and only feeds the effect; the base color shows while
+      // it loads — or when there is no wallpaper at all.
+      Image {
+        id: lockWallpaper
+
+        anchors.fill: parent
+        source: service.wallpaperPath.length > 0 ? "file://" + service.wallpaperPath : ""
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: true
+        visible: false
+      }
+
+      MultiEffect {
+        anchors.fill: lockWallpaper
+        source: lockWallpaper
+        visible: lockWallpaper.status === Image.Ready
+        blurEnabled: true
+        blur: 0.8
+        blurMax: 64
+      }
+
+      // Readability scrim over the blur, deep enough that the password
+      // field reads on any image.
+      Rectangle {
+        anchors.fill: parent
+        visible: lockWallpaper.status === Image.Ready
+        color: "#c8101014"
+      }
 
       // Any event wakes the display and re-arms the blank timer, like
       // Omarchy's wakeRequested.

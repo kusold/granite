@@ -1,8 +1,9 @@
 // M4: the session menu — the power menu half of Omarchy's system menu
-// (their omarchy-menu system.* entries): lock, suspend, logout, reboot,
-// shutdown. SUPER+SHIFT+E (bound in hyprland.lua via `qs ipc call session
-// toggle`) opens the same overlay geometry as the launcher: a centered
-// card on the focused monitor, keyboard + mouse navigation, scrim closes.
+// (their omarchy-menu system.* entries): lock, screensaver, suspend,
+// logout, reboot, shutdown. SUPER+SHIFT+E (bound in hyprland.lua via `qs
+// ipc call session toggle`) opens the same overlay geometry as the
+// launcher: a centered card on the focused monitor, keyboard + mouse
+// navigation, scrim closes.
 //
 // Omarchy behaviors kept here, simplified: suspend locks first (their
 // lid-close recipe) so resume lands on the lock screen; logout is `uwsm
@@ -37,6 +38,7 @@ Item {
   // Nerd Font glyphs, like Omarchy's omarchy-menu system icons.
   readonly property var actions: [
     { id: "lock", glyph: "󰌾", label: "Lock", detail: "Lock the session" },
+    { id: "screensaver", glyph: "󱄄", label: "Screensaver", detail: "Start the wallpaper screensaver" },
     { id: "suspend", glyph: "󰒲", label: "Suspend", detail: "Lock, then suspend to memory" },
     { id: "logout", glyph: "󰍃", label: "Log out", detail: "End the Hyprland session" },
     { id: "reboot", glyph: "󰜉", label: "Reboot", detail: "Restart the system" },
@@ -83,6 +85,11 @@ Item {
       case "lock":
         if (service.lock) service.lock.beginLock()
         else runDetached(["qs", "ipc", "call", "lock", "lock"])
+        break
+      case "screensaver":
+        // Omarchy's System > Screensaver entry, which forces it up even
+        // with the idle one off; the shell's service does the same.
+        runDetached(["qs", "ipc", "call", "screensaver", "start"])
         break
       case "suspend":
         // Lock first so resume lands on the lock screen; the delay lets the

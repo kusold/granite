@@ -1,10 +1,11 @@
-// Quickshell desktop shell, M1 + M2 + M3 + M4 + M5: one bar per screen
+// Quickshell desktop shell, M1 + M2 + M3 + M4 + M5 + M6: one bar per screen
 // (workspaces, focused window title, clock, system tray), the notifications
 // daemon (toast stack, do-not-disturb, in-memory history), the launcher
 // (fuzzy app search over desktop entries, launched through uwsm), the lock
 // screen (ext-session-lock + PAM), the idle policy (lock / suspend timers),
-// the session menu (power actions), and the clipboard history (wl-paste
-// capture, searchable picker).
+// the session menu (power actions), the clipboard history (wl-paste
+// capture, searchable picker), and the background + screensaver (per-screen
+// wallpaper surface, thumbnail picker, idle slideshow).
 //
 // The architecture follows Omarchy Quattro: a single long-running Quickshell
 // instance hosts the whole desktop; bar, launcher, notifications, lock, etc.
@@ -34,12 +35,25 @@ ShellRoot {
   Launcher { }
 
   // M4: lock + idle. Idle locks through the Lock instance in-process; the
-  // session menu locks/suspends through it too.
-  Lock { id: lock }
+  // session menu locks/suspends through it too. The lock also shows the
+  // current background blurred behind its field.
+  Background { id: background }
+  Lock {
+    id: lock
+
+    backgroundService: background
+  }
   Idle { lock: lock }
   SessionMenu { lock: lock }
 
   // M5: the clipboard history — capture watchers plus the picker overlay
   // (see Clipboard.qml).
   Clipboard { }
+
+  // M6: the screensaver — an idle slideshow over the background's library
+  // (see Screensaver.qml).
+  Screensaver {
+    background: background
+    lock: lock
+  }
 }

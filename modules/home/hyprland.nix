@@ -8,7 +8,7 @@
 #   M3 launcher / menu                    <- done
 #   M4 lock + idle                        <- done
 #   M5 clipboard history                  <- done
-#   M6 background switcher / screensaver
+#   M6 background switcher / screensaver  <- done
 # Until then a few stand-ins are used (hyprpolkitagent, playerctl, plain
 # grim/slurp captures) — see config/hypr/hyprland.lua TODOs.
 #
@@ -39,6 +39,42 @@
         source = ../../config/quickshell;
         recursive = true;
       };
+
+      # M6's background library: a starter set of Nix wallpapers under
+      # ~/.local/share/granite/backgrounds (Background.qml scans it, plus
+      # ~/.local/share/backgrounds for images of the user's own). Shipping
+      # the set through home-manager means a wiped $HOME grows its
+      # wallpaper back on the next switch; the current choice itself is
+      # runtime state (~/.local/state/granite/background) and re-seeds from
+      # the library when lost.
+      xdg.dataFile = builtins.listToAttrs (
+        map
+          (
+            name:
+            let
+              dir = pkgs.nixos-artwork.wallpapers.${name};
+              # Each wallpaper derivation ships its image under
+              # share/backgrounds/nixos under slightly different file
+              # names — resolve it rather than hardcoding per entry.
+              png = builtins.head (lib.filesystem.listFilesRecursive "${dir}/share/backgrounds/nixos");
+            in
+            {
+              name = "granite/backgrounds/${name}.png";
+              value.source = png;
+            }
+          )
+          [
+            "nineish-dark-gray"
+            "simple-dark-gray"
+            "gradient-grey"
+            "catppuccin-mocha"
+            "nineish-catppuccin-mocha"
+            "dracula"
+            "moonscape"
+            "waterfall"
+            "gnome-dark"
+          ]
+      );
 
       # One shell instance per graphical session, like Omarchy's
       # omarchy-launch-shell (which supervises theirs from Hyprland

@@ -50,7 +50,7 @@
         awscli2
         btop
         devenv # devenv.sh; paired with programs.direnv above via `use devenv`
-		fzf
+        fzf
         gh
         git
         go

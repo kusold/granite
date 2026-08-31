@@ -19,7 +19,7 @@ in
       home.stateVersion = "25.11";
 
       home.packages = [
-			  pkgs.sonar-scanner-cli
+        pkgs.sonar-scanner-cli
         # unstable isn't needed, but stable has build failures
         pkgs-unstable.aws-sam-cli
         pkgs.docker-compose

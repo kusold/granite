@@ -92,6 +92,16 @@
         # entries that a naive exec-string parse misses.
         gtk3
 
+        # The launcher's dmenu modes for scripts (Omarchy's omarchy-menu
+        # select/input): pick-lists and text prompts served by the quickshell
+        # shell over qs ipc — see config/quickshell/Launcher.qml.
+        (writeShellScriptBin "granite-menu-select" (
+          builtins.readFile ../../config/hypr/bin/granite-menu-select
+        ))
+        (writeShellScriptBin "granite-menu-input" (
+          builtins.readFile ../../config/hypr/bin/granite-menu-input
+        ))
+
         # Omarchy Quattro core utilities
         wl-clipboard # clipboard (history moves into the shell in M5)
         pamixer

@@ -8,10 +8,19 @@
 // matching, Escape clears the filter before closing, Tab completes the
 // query to the selection, and launch frequency ranks the list (persisted
 // under ~/.local/state/granite, like the notifications settings) so the
-// empty query opens onto the most-used apps. What's deliberately NOT here
-// yet: per-entry desktop actions, a dmenu mode for scripts, and the
-// drilldown command/power menus (the system menu grows in M4 alongside
-// lock + idle).
+// empty query opens onto the most-used apps. Entries that ship desktop
+// actions (the .desktop "Actions" group) grow them two ways: matching
+// actions appear as their own rows under a query, and arrow-right drills
+// into one entry's action list (arrow-left / Backspace comes back).
+//
+// The same overlay serves Omarchy's dmenu modes for scripts — a pick list
+// (`granite-menu-select`, their omarchy-menu select) and a text prompt
+// (`granite-menu-input`). The script drops temp-file paths over qs ipc;
+// the answer is written back through them, and the polling script wakes
+// (their temp-file handshake, kept whole).
+//
+// What's deliberately NOT here yet: the drilldown command/power menus
+// (the system menu grows in M4 alongside lock + idle).
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
@@ -40,7 +49,33 @@ Item {
   property string query: ""
   property int selectedIndex: 0
 
+  // "apps" is the app launcher. "select" and "input" are the dmenu modes
+  // scripts drive (Omarchy's omarchy-menu select / input): a pick list or
+  // a text prompt whose answer returns to the calling script.
+  property string mode: "apps"
+  property string dmenuPrompt: ""
+  // Parsed dmenu options: [{ glyph, label, detail }].
+  property var dmenuOptions: []
+  property string selectionFile: ""
+  property string doneFile: ""
+  property bool requestActive: false
+
+  // The entry whose desktop actions are listed (arrow-right drilldown).
+  property string drilldownId: ""
+
+  // Dmenu rows and the drilldown show row subtext unconditionally: it is
+  // the caller's (or the app's own) context, not search noise.
+  readonly property bool detailsAlwaysVisible: mode !== "apps" || drilldownId !== ""
+
   ListModel { id: results }
+
+  // DesktopAction objects parallel to the results model, one slot per row
+  // (null for app and dmenu rows). QObject wrappers never go into the
+  // ListModel itself — a churned entry leaves a dangling C++ pointer in a
+  // model role, and the next read segfaults (Omarchy's lesson, kept from
+  // the notifications daemon). A JS slot only ever degrades to a
+  // catchable error.
+  property var actionObjects: []
 
   // ----- launch frequency --------------------------------------------------
   //
@@ -105,10 +140,56 @@ Item {
 
   // ----- results -----------------------------------------------------------
 
+  // Rows for the dmenu select mode: caller-supplied options filtered by
+  // substring on the label or the subtext (Omarchy's filter), keeping the
+  // caller's order.
+  function dmenuRowsFor(filter) {
+    var q = String(filter || "").trim().toLowerCase()
+    var rows = []
+    for (var i = 0; i < service.dmenuOptions.length; i++) {
+      var option = service.dmenuOptions[i]
+      if (q && option.label.toLowerCase().indexOf(q) < 0
+          && option.detail.toLowerCase().indexOf(q) < 0) continue
+      rows.push({
+        entryId: "",
+        actionId: "",
+        label: option.label,
+        icon: "",
+        glyph: option.glyph,
+        detail: option.detail,
+        hasActions: false,
+        score: i,
+        uses: 0
+      })
+    }
+    return rows
+  }
+
   function rebuildResults() {
-    var rows = LauncherSearch.sortedEntries(DesktopEntries.applications.values, service.query, service.usageCounts)
+    // A drilldown whose entry vanished (uninstall, entries churned) falls
+    // back to the app list.
+    if (service.mode === "apps" && service.drilldownId !== ""
+        && !DesktopEntries.byId(service.drilldownId)) {
+      service.drilldownId = ""
+    }
+
+    var rows
+    if (service.mode === "select")
+      rows = service.dmenuRowsFor(service.query)
+    else if (service.mode === "input")
+      rows = []  // the field is the answer; there is nothing to list
+    else if (service.drilldownId !== "")
+      rows = LauncherSearch.drilldownRows(DesktopEntries.byId(service.drilldownId), service.query, service.usageCounts)
+    else
+      rows = LauncherSearch.sortedEntries(DesktopEntries.applications.values, service.query, service.usageCounts)
+
     results.clear()
-    for (var i = 0; i < rows.length; i++) results.append(rows[i])
+    var objects = []
+    for (var i = 0; i < rows.length; i++) {
+      results.append(rows[i])
+      objects.push(rows[i].actionId ? service.actionFor(rows[i].entryId, rows[i].actionId) : null)
+    }
+    service.actionObjects = objects
     service.selectedIndex = results.count > 0 ? 0 : -1
   }
 
@@ -125,12 +206,20 @@ Item {
   // ----- open / close ------------------------------------------------------
 
   function open() {
+    // A manual open cancels any pending script request — the overlay is a
+    // single surface, and the user asked for it.
+    if (service.requestActive) service.finishRequest(null)
+    service.mode = "apps"
+    service.drilldownId = ""
     service.opened = true
     setQuery("")
     return "opened"
   }
 
   function close() {
+    if (service.requestActive) service.finishRequest(null)
+    service.mode = "apps"
+    service.drilldownId = ""
     service.opened = false
     return "closed"
   }
@@ -169,11 +258,85 @@ Item {
   // exec-string parse would fail. The .desktop suffix is required or ids
   // like org.gnome.Nautilus don't resolve.
   function launchAt(index) {
+    if (service.mode === "input") {
+      service.finishRequest(searchInput.text)
+      service.mode = "apps"
+      service.opened = false
+      return
+    }
+    if (service.mode === "select") {
+      if (index < 0 || index >= results.count) return
+      var picked = results.get(index)
+      // Omarchy's rule: a plain option returns its label; one with subtext
+      // returns "<label><TAB><subtext>" — a stable key for same-named rows.
+      service.finishRequest(picked.detail ? picked.label + "\t" + picked.detail : picked.label)
+      service.mode = "apps"
+      service.opened = false
+      return
+    }
     if (index < 0 || index >= results.count) return
     var row = results.get(index)
     rememberUse(row.entryId)
-    Quickshell.execDetached(["uwsm-app", "--", "gtk-launch", row.entryId + ".desktop"])
+    var action = row.actionId ? (service.actionObjects[index] || null) : null
+    if (action) launchAction(action)
+    else Quickshell.execDetached(["uwsm-app", "--", "gtk-launch", row.entryId + ".desktop"])
     close()
+  }
+
+  // A desktop action launches its own command (field codes already
+  // stripped by Quickshell's exec parser) through the same uwsm-app scope
+  // recipe as the app itself — gtk-launch has no way to reach actions.
+  function launchAction(action) {
+    var command = []
+    try {
+      for (var i = 0; i < action.command.length; i++) command.push(String(action.command[i]))
+    } catch (e) {
+      console.warn("launcher: desktop action unreadable:", e)
+      return
+    }
+    if (command.length === 0) return
+    Quickshell.execDetached(["uwsm-app", "--"].concat(command))
+  }
+
+  // The DesktopAction object for a row, resolved fresh from the entry —
+  // never cached across rebuilds, so entry churn can't leave a stale
+  // wrapper in play longer than the list it belongs to.
+  function actionFor(entryId, actionId) {
+    var entry = DesktopEntries.byId(entryId)
+    if (!entry) return null
+    var actions = LauncherSearch.entryActions(entry)
+    for (var i = 0; i < actions.length; i++) {
+      if (String(actions[i].id) === String(actionId)) return actions[i]
+    }
+    return null
+  }
+
+  // ----- the desktop-action drilldown --------------------------------------
+
+  function enterDrilldown(index) {
+    if (service.mode !== "apps" || service.drilldownId !== "") return
+    if (index < 0 || index >= results.count) return
+    var row = results.get(index)
+    if (row.actionId || !row.hasActions) return
+    service.drilldownId = row.entryId
+    service.selectedIndex = 0
+    rebuildResults()
+  }
+
+  function exitDrilldown() {
+    if (service.drilldownId === "") return
+    var restoreId = service.drilldownId
+    service.drilldownId = ""
+    rebuildResults()
+    // Land the selection back on the entry whose actions were just left,
+    // when it is still in the list.
+    for (var i = 0; i < results.count; i++) {
+      var row = results.get(i)
+      if (row.entryId === restoreId && !row.actionId) {
+        service.selectedIndex = i
+        break
+      }
+    }
   }
 
   function moveSelection(delta) {
@@ -188,8 +351,103 @@ Item {
       resultList.positionViewAtIndex(service.selectedIndex, ListView.Contain)
   })
 
+  // ----- dmenu requests ----------------------------------------------------
+  //
+  // Scripts drive the overlay as a menu: granite-menu-select / -input (see
+  // config/hypr/bin) drop two temp-file paths over qs ipc, the user picks,
+  // and the answer lands in the selection file followed by the done file —
+  // Omarchy's handshake, kept whole so porting their scripts is mechanical.
+
+  function shellQuote(value) {
+    return "'" + String(value).replace(/'/g, "'\\''") + "'"
+  }
+
+  function startDmenu(kind, prompt, selectionPath, donePath, options) {
+    // A new request replaces any pending one — the previous script's poll
+    // unblocks with no selection instead of hanging forever.
+    if (service.requestActive) service.finishRequest(null)
+
+    service.mode = kind
+    service.dmenuPrompt = String(prompt || (kind === "input" ? "Input" : "Select"))
+    service.selectionFile = String(selectionPath || "")
+    service.doneFile = String(donePath || "")
+    service.requestActive = service.doneFile.length > 0
+    service.drilldownId = ""
+
+    // An option line is "<label>", "<glyph>\t<label>", or
+    // "<glyph>\t<label>\t<subtext>" (Omarchy's format): the glyph shows but
+    // never returns; the subtext renders under the label, filters with it,
+    // and returns as the stable key for same-named rows.
+    var parsed = []
+    var lines = String(options || "").split("\n")
+    for (var i = 0; i < lines.length; i++) {
+      if (!lines[i]) continue
+      var parts = lines[i].split("\t")
+      var glyph = parts.length > 1 ? parts.shift() : ""
+      var label = parts.shift() || ""
+      var detail = parts.join("\t")
+      if (!label) continue
+      parsed.push({ glyph: glyph, label: label, detail: detail })
+    }
+    service.dmenuOptions = parsed
+
+    if (kind === "select" && parsed.length === 0) {
+      // Nothing to pick from — fail the request now rather than showing an
+      // empty menu the caller can't do anything with.
+      service.finishRequest(null)
+      service.mode = "apps"
+      return "error: no options"
+    }
+
+    service.opened = true
+    setQuery("")
+    return "ok"
+  }
+
+  // Hand the answer back to the waiting script: the selection (null =
+  // cancelled) lands in the selection file, then the done file appears and
+  // the polling script unblocks.
+  function finishRequest(selection) {
+    if (!service.requestActive || !service.doneFile) {
+      service.opened = false
+      return
+    }
+
+    var selectionPath = service.selectionFile
+    var donePath = service.doneFile
+    service.requestActive = false
+    service.selectionFile = ""
+    service.doneFile = ""
+
+    if (selection === null || selection === undefined) {
+      resultProc.command = ["bash", "-c", ": > " + shellQuote(donePath)]
+    } else {
+      resultProc.command = [
+        "bash", "-c",
+        "printf '%s\\n' " + shellQuote(selection) + " > " + shellQuote(selectionPath)
+          + "; : > " + shellQuote(donePath)
+      ]
+    }
+    service.runResultProc()
+  }
+
+  // A Process ignores a command change while it is running, and the write
+  // itself is a millisecond of bash — if one is still in flight, land the
+  // next on the following event-loop turn instead of dropping it (a
+  // dropped done file would hang the polling script forever).
+  function runResultProc() {
+    if (resultProc.running) {
+      Qt.callLater(service.runResultProc)
+      return
+    }
+    resultProc.running = true
+  }
+
   // ----- IPC ---------------------------------------------------------------
-  // Driven by keybinds and scripts: `qs ipc call launcher toggle`.
+  // Driven by keybinds and scripts: `qs ipc call launcher toggle`, and the
+  // dmenu pair behind granite-menu-select / granite-menu-input (qs ipc
+  // passes each argument through untouched, so the option list rides as
+  // one newline-joined string).
 
   IpcHandler {
     target: "launcher"
@@ -206,9 +464,22 @@ Item {
       return service.close()
     }
 
+    function dmenuSelect(prompt: string, selectionFile: string, doneFile: string, options: string): string {
+      return service.startDmenu("select", prompt, selectionFile, doneFile, options)
+    }
+
+    function dmenuInput(prompt: string, selectionFile: string, doneFile: string): string {
+      return service.startDmenu("input", prompt, selectionFile, doneFile, "")
+    }
+
     function ping(): string {
       return "ok"
     }
+  }
+
+  // Writes the dmenu answer back to the calling script's temp files.
+  Process {
+    id: resultProc
   }
 
   // Make sure the state directory exists before the first usage save.
@@ -344,9 +615,12 @@ Item {
             Keys.onPressed: function(event) {
               switch (event.key) {
                 case Qt.Key_Escape:
-                  // Omarchy's rule: the first Escape clears the filter,
-                  // the second closes.
+                  // Omarchy's ladder: the first Escape clears the filter,
+                  // the second leaves a drilldown, the third closes. In the
+                  // input mode the typed text is the answer, so clearing it
+                  // first is also cancelling in two steps.
                   if (service.query.length > 0) service.setQuery("")
+                  else if (service.drilldownId !== "") service.exitDrilldown()
                   else service.close()
                   event.accepted = true
                   break
@@ -357,10 +631,27 @@ Item {
                   break
                 case Qt.Key_Tab:
                   // Complete the query to the selection, fuzzel-style:
-                  // refine, then Enter launches.
-                  if (service.selectedIndex >= 0)
+                  // refine, then Enter launches. Apps mode only — in the
+                  // dmenu modes the text is the answer, not a filter to
+                  // complete against hidden app rows.
+                  if (service.mode === "apps" && service.selectedIndex >= 0)
                     service.setQuery(results.get(service.selectedIndex).label)
                   event.accepted = true
+                  break
+                case Qt.Key_Right:
+                  // Arrow-right opens the selected entry's desktop actions
+                  // (the chevron rows); anything else lets the cursor move.
+                  service.enterDrilldown(service.selectedIndex)
+                  event.accepted = service.drilldownId !== ""
+                  break
+                case Qt.Key_Left:
+                case Qt.Key_Backspace:
+                  // Leaving a drilldown only when there is nothing to edit
+                  // left in the field — otherwise the keys keep typing.
+                  if (service.drilldownId !== "" && service.query.length === 0) {
+                    service.exitDrilldown()
+                    event.accepted = true
+                  }
                   break
                 case Qt.Key_Up:
                   service.moveSelection(-1)
@@ -394,7 +685,13 @@ Item {
               anchors.leftMargin: 1
               verticalAlignment: Text.AlignVCenter
               visible: searchInput.text.length === 0
-              text: "Search apps…"
+              // The field doubles as the dmenu surface, like Omarchy's menu
+              // header: empty, it names what is being asked for.
+              text: {
+                if (service.mode !== "apps") return service.dmenuPrompt + "…"
+                if (service.drilldownId !== "") return "Filter actions…"
+                return "Search apps…"
+              }
               color: service.foreground
               opacity: 0.5
               font.family: service.fontFamily
@@ -407,7 +704,9 @@ Item {
 
         Item {
           width: parent.width
-          height: Math.max(service.rowHeight, Math.min(results.count, service.maxVisibleRows) * (service.rowHeight + 2) - (results.count > 0 ? 2 : 0))
+          // The input mode is just the field — no rows, no empty-state
+          // label pretending to be one.
+          height: service.mode === "input" ? 0 : Math.max(service.rowHeight, Math.min(results.count, service.maxVisibleRows) * (service.rowHeight + 2) - (results.count > 0 ? 2 : 0))
 
           ListView {
             id: resultList
@@ -424,9 +723,12 @@ Item {
 
               required property int index
               required property string entryId
+              required property string actionId
               required property string label
               required property string icon
+              required property string glyph
               required property string detail
+              required property bool hasActions
 
               width: resultList.width
               height: service.rowHeight
@@ -451,15 +753,18 @@ Item {
 
                     anchors.fill: parent
                     implicitSize: 24
-                    source: service.iconSource(row.icon)
+                    visible: row.glyph.length === 0
+                    source: row.glyph.length === 0 ? service.iconSource(row.icon) : ""
                   }
 
                   // Glyph fallback for entries with no resolvable icon —
-                  // the same treatment as the notification bell.
+                  // the same treatment as the notification bell — and the
+                  // slot for a dmenu option's caller-supplied glyph, which
+                  // renders as text like Omarchy's rows.
                   Text {
                     anchors.centerIn: parent
-                    visible: appIcon.status !== Image.Ready
-                    text: "󰀳"
+                    visible: row.glyph.length > 0 || appIcon.status !== Image.Ready
+                    text: row.glyph.length > 0 ? row.glyph : "󰀳"
                     color: service.foreground
                     font.family: service.fontFamily
                     font.pixelSize: 18
@@ -471,7 +776,7 @@ Item {
                   spacing: 1
 
                   Text {
-                    width: card.width - 24 - 12 - 8 - 8 - iconSlot.width - 10
+                    width: row.textWidth
                     text: row.label
                     color: row.index === service.selectedIndex ? "#101014" : service.foreground
                     font.family: service.fontFamily
@@ -482,10 +787,12 @@ Item {
 
                   // Details surface while a search narrows the list, like
                   // Omarchy's rows — they disambiguate between the five
-                  // matches a term typically leaves.
+                  // matches a term typically leaves. Dmenu rows and the
+                  // drilldown keep them always on: the subtext is the
+                  // caller's (or the app's own) context, not noise.
                   Text {
-                    width: card.width - 24 - 12 - 8 - 8 - iconSlot.width - 10
-                    visible: service.query.length > 0 && row.detail.length > 0
+                    width: row.textWidth
+                    visible: (service.query.length > 0 || service.detailsAlwaysVisible) && row.detail.length > 0
                     text: row.detail
                     color: row.index === service.selectedIndex ? "#40101014" : service.foreground
                     opacity: 0.55
@@ -493,6 +800,20 @@ Item {
                     font.pixelSize: 11
                     elide: Text.ElideRight
                   }
+                }
+
+                // Rows with desktop actions grow a chevron: arrow-right
+                // drills into them (Omarchy's submenu affordance).
+                Text {
+                  id: chevron
+
+                  anchors.verticalCenter: parent.verticalCenter
+                  visible: row.hasActions && service.mode === "apps" && service.drilldownId === ""
+                  text: "›"
+                  color: row.index === service.selectedIndex ? "#101014" : service.foreground
+                  opacity: 0.5
+                  font.family: service.fontFamily
+                  font.pixelSize: 15
                 }
               }
 
@@ -505,13 +826,17 @@ Item {
               TapHandler {
                 onTapped: service.launchAt(row.index)
               }
+
+              // The label/details width: the card minus its chrome and the
+              // icon slot, giving the chevron its room when one shows.
+              readonly property real textWidth: card.width - 24 - 12 - 8 - 8 - iconSlot.width - 10 - (chevron.visible ? 18 : 0)
             }
           }
 
           Text {
             anchors.centerIn: parent
-            visible: results.count === 0
-            text: service.query.length > 0 ? "No matches" : "No applications found"
+            visible: results.count === 0 && service.mode !== "input"
+            text: service.query.length > 0 ? "No matches" : service.mode === "select" ? "No options" : "No applications found"
             color: service.foreground
             opacity: 0.5
             font.family: service.fontFamily

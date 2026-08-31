@@ -75,7 +75,6 @@
         yq
 
         # AI
-        llm-agents.beads
         llm-agents.ccstatusline
         llm-agents.ccusage
         llm-agents.openspec

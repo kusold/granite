@@ -88,6 +88,7 @@ Item {
     }
 
     resetAuthenticationState()
+    displayBlanked = false
     lockRequested = true
     armBlankTimer()
     requestSessionLock()
@@ -158,8 +159,10 @@ Item {
   // Lua and hl.dispatch wants a dispatcher OBJECT, so the classic
   // "dpms on" string form is a syntax error — build the hl.dsp.* call
   // instead (the same reason Bar.qml's workspace clicks needed fixing).
+  // The state must be a STRING: a Lua boolean stringifies to "true"/"false",
+  // which the dispatcher treats as unrecognized and toggles instead.
   function dispatchDpms(on) {
-    Hyprland.dispatch(on ? "hl.dsp.dpms({ on = true })" : "hl.dsp.dpms({ on = false })")
+    Hyprland.dispatch(on ? 'hl.dsp.dpms({ on = "on" })' : 'hl.dsp.dpms({ on = "off" })')
   }
 
   Timer {

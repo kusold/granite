@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# Captures the clipboard as one JSON entry on stdout, for the quickshell
+# clipboard history (M5). Ported from Omarchy's
+# shell/plugins/clipboard/capture.sh (https://github.com/basecamp/omarchy,
+# MIT), simplified: jq JSON-encodes the text payload (lossily replacing
+# invalid UTF-8) where Omarchy sniffs UTF-16 with perl, and captured
+# images are bounded like the notifications daemon's image copies.
+#
+# Modes (driven by Clipboard.qml):
+#   granite-clipboard-capture text       payload on stdin (wl-paste --watch)
+#   granite-clipboard-capture image/png  payload on stdin (wl-paste --watch)
+#   granite-clipboard-capture            snapshot the current clipboard
+#
+# Installed by modules/home/hyprland.nix with jq baked into PATH; wl-paste
+# and friends come from wl-clipboard in the shell's environment.
+set -o pipefail
+
+STATE_DIR="$HOME/.local/state/granite"
+IMAGE_DIR="$STATE_DIR/clipboard-images"
+IMAGE_LIMIT=5242880
+
+types=$(wl-paste --list-types 2>/dev/null || true)
+
+# Password managers mark secret payloads with the KDE concealment MIME
+# type (Omarchy's check); CLIPBOARD_STATE=sensitive is their terminal
+# wrapper's hint. Either one skips the capture entirely.
+if [[ ${CLIPBOARD_STATE:-} == "sensitive" ]] || grep -qx "x-kde-passwordManagerHint" <<<"$types"; then
+  exit 0
+fi
+
+emit_image() {
+  local mime="$1" ext tmp hash file size
+
+  ext=${mime#image/}
+  [[ $ext == jpeg ]] && ext=jpg
+  mkdir -p "$IMAGE_DIR" || return 0
+
+  # Bounded read into a temp file, validated, then renamed into place —
+  # the clipboard is untrusted input and must not fill the state dir.
+  tmp=$(mktemp --tmpdir="$IMAGE_DIR" clipboard.XXXXXX.tmp) || return 0
+  timeout 5 head -c $((IMAGE_LIMIT + 1)) >"$tmp" 2>/dev/null
+  size=$(stat -c%s -- "$tmp" 2>/dev/null || echo 0)
+  if (( size == 0 || size > IMAGE_LIMIT )); then
+    rm -f -- "$tmp"
+    return 0
+  fi
+
+  # Content-addressed: re-copies (a history selection re-copies the same
+  # bytes) land on the same file instead of accumulating duplicates.
+  hash=$(sha256sum -- "$tmp" | awk '{print $1}')
+  file="$IMAGE_DIR/$hash.$ext"
+  if [[ -e $file ]]; then
+    rm -f -- "$tmp"
+  else
+    mv -f -- "$tmp" "$file"
+  fi
+
+  jq -cn --arg mime "$mime" --arg path "$file" --arg capturedAt "$(date "+%A %H:%M")" \
+    '{type:"image", mime:$mime, path:$path, capturedAt:$capturedAt}'
+}
+
+emit_text() {
+  # -R reads raw stdin, -s slurps it into one string, -c keeps the entry
+  # on a single line (wl-paste --watch granularity — one line per event);
+  # select() keeps the line from ever existing for empty payloads. The QML
+  # side drops whitespace-only text.
+  jq -cRs 'select(length > 0) | {type:"text", text:.}'
+}
+
+case "${1:-}" in
+  text) emit_text ;;
+  image/*) emit_image "$1" ;;
+  *)
+    # Snapshot mode: prefer an image payload (screenshots), then text.
+    for mime in image/png image/jpeg image/webp image/gif image/bmp image/tiff; do
+      if grep -qx "$mime" <<<"$types"; then
+        timeout 2 wl-paste --type "$mime" 2>/dev/null | emit_image "$mime"
+        exit 0
+      fi
+    done
+    if grep -q "^text/" <<<"$types" || grep -qx "UTF8_STRING" <<<"$types" || grep -qx "STRING" <<<"$types"; then
+      wl-paste --type text --no-newline 2>/dev/null | emit_text
+    fi
+    ;;
+esac

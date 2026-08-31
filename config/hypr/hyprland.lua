@@ -234,6 +234,7 @@ hl.animation({ leaf = "workspaces", enabled = false })
 -- (Omarchy applies the same treatment to their menu/launcher namespaces.)
 hl.layer_rule({ match = { namespace = "mike-launcher" }, no_anim = true, animation = "none" })
 hl.layer_rule({ match = { namespace = "mike-session" }, no_anim = true, animation = "none" })
+hl.layer_rule({ match = { namespace = "mike-clipboard" }, no_anim = true, animation = "none" })
 
 -- Window rules --------------------------------------------------------------
 -- https://wiki.hypr.land/Configuring/Basics/Window-Rules/
@@ -410,6 +411,10 @@ bind_cmd("SUPER + CTRL + N", "Toggle nightlight", "sh -c 'pkill hyprsunset || hy
 
 -- The quickshell shell is the notifications daemon (M2); qs ipc talks to it.
 bind_cmd("SUPER + N", "Toggle do-not-disturb", "qs ipc call notifications toggleDnd")
+
+-- The clipboard history (M5) lives in the quickshell shell; SUPER+CTRL+V is
+-- Omarchy's clipboard manager binding.
+bind_cmd("SUPER + CTRL + V", "Clipboard history", "qs ipc call clipboard toggle")
 
 -- Session -------------------------------------------------------------------
 -- The lock screen, idle timers, and session menu (M4) live in the quickshell

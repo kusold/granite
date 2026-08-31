@@ -7,7 +7,7 @@
 #   M2 notifications daemon               <- done
 #   M3 launcher / menu                    <- done
 #   M4 lock + idle                        <- done
-#   M5 clipboard history
+#   M5 clipboard history                  <- done
 #   M6 background switcher / screensaver
 # Until then a few stand-ins are used (hyprpolkitagent, playerctl, plain
 # grim/slurp captures) — see config/hypr/hyprland.lua TODOs.
@@ -109,8 +109,20 @@
           builtins.readFile ../../config/hypr/bin/granite-menu-input
         ))
 
+        # M5's clipboard capture, driven by Clipboard.qml's
+        # `wl-paste --watch` processes and once at shell startup for the
+        # current clipboard. jq is baked into the wrapper's PATH so the
+        # JSON encoding never depends on the shell service's environment
+        # (wl-paste itself comes from wl-clipboard below).
+        (writeShellScriptBin "granite-clipboard-capture" (
+          ''
+            export PATH="${lib.makeBinPath [ jq ]}:$PATH"
+          ''
+          + builtins.readFile ../../config/hypr/bin/granite-clipboard-capture
+        ))
+
         # Omarchy Quattro core utilities
-        wl-clipboard # clipboard (history moves into the shell in M5)
+        wl-clipboard # clipboard: wl-paste --watch feeds M5's history, wl-copy serves the picker's selections
         pamixer
         brightnessctl
         hyprsunset # night light

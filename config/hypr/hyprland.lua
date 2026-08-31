@@ -227,6 +227,13 @@ hl.animation({ leaf = "fadeLayersIn", enabled = true, speed = 1.79, bezier = "al
 hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 1.39, bezier = "almostLinear" })
 hl.animation({ leaf = "workspaces", enabled = false })
 
+-- Layer rules --------------------------------------------------------------
+-- https://wiki.hypr.land/Configuring/Advanced-and-Cool/Animations/#layerrule
+
+-- Shell overlays open instantly — their own QML handles any transitions.
+-- (Omarchy applies the same treatment to their menu/launcher namespaces.)
+hl.layer_rule({ match = { namespace = "mike-launcher" }, no_anim = true, animation = "none" })
+
 -- Window rules --------------------------------------------------------------
 -- https://wiki.hypr.land/Configuring/Basics/Window-Rules/
 
@@ -311,6 +318,11 @@ launch_on_start("udiskie --automount --no-notify --no-tray")
 -- to graphical-session.target — see modules/home/hyprland.nix.
 
 -- Applications --------------------------------------------------------------
+
+-- The launcher (M3) lives in the quickshell shell; qs ipc toggles it, the
+-- same mechanism as the notifications DND keybind below. SUPER+SPACE is
+-- Omarchy Quattro's launcher binding.
+bind_cmd("SUPER + SPACE", "Launcher", "qs ipc call launcher toggle")
 
 bind_app("SUPER + RETURN", "Terminal", "ghostty")
 bind_app("SUPER + SHIFT + RETURN", "Browser", "firefox")

@@ -5,7 +5,7 @@
 # Roadmap: the quickshell shell grows Omarchy's plugins incrementally:
 #   M1 bar (workspaces, clock, tray)      <- done
 #   M2 notifications daemon               <- done
-#   M3 launcher / menu
+#   M3 launcher / menu                    <- done
 #   M4 lock + idle
 #   M5 clipboard history
 #   M6 background switcher / screensaver
@@ -87,6 +87,10 @@
         ghostty
         quickshell
         libnotify # notify-send; talks to the shell's notification server
+        # The launcher's desktop-entry resolver: `uwsm-app -- gtk-launch <id>`
+        # (Omarchy's recipe) resolves ids with spaces and Terminal=true
+        # entries that a naive exec-string parse misses.
+        gtk3
 
         # Omarchy Quattro core utilities
         wl-clipboard # clipboard (history moves into the shell in M5)

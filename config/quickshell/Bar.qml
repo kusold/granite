@@ -4,6 +4,7 @@
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import Quickshell.Widgets
 import Quickshell.Services.SystemTray
 import QtQuick
 
@@ -94,8 +95,8 @@ PanelWindow {
 
       property var focused: Hyprland.focusedWorkspace !== null ? Hyprland.focusedWorkspace.focusedWindow : null
 
-      visible: focused !== null && focused.title !== ""
-      text: focused !== null ? focused.title : ""
+      visible: !!focused && !!focused.title
+      text: focused && focused.title ? focused.title : ""
       color: root.foreground
       opacity: 0.9
       font.family: root.fontFamily

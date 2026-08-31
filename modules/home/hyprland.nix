@@ -4,7 +4,7 @@
 #
 # Roadmap: the quickshell shell grows Omarchy's plugins incrementally:
 #   M1 bar (workspaces, clock, tray)      <- done
-#   M2 notifications daemon
+#   M2 notifications daemon               <- done
 #   M3 launcher / menu
 #   M4 lock + idle
 #   M5 clipboard history
@@ -86,6 +86,7 @@
       home.packages = with pkgs; [
         ghostty
         quickshell
+        libnotify # notify-send; talks to the shell's notification server
 
         # Omarchy Quattro core utilities
         wl-clipboard # clipboard (history moves into the shell in M5)

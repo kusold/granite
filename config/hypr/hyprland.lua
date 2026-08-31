@@ -395,6 +395,9 @@ bind_cmd("SUPER + PRINT", "Color picker", "sh -c 'pkill hyprpicker || hyprpicker
 
 bind_cmd("SUPER + CTRL + N", "Toggle nightlight", "sh -c 'pkill hyprsunset || hyprsunset -t 4000'")
 
+-- The quickshell shell is the notifications daemon (M2); qs ipc talks to it.
+bind_cmd("SUPER + N", "Toggle do-not-disturb", "qs ipc call notifications toggleDnd")
+
 -- Session -------------------------------------------------------------------
 -- TODO(shell M4): lock screen (Omarchy locks from the quickshell shell) and
 -- a system/power menu live here once the shell grows those plugins.

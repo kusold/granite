@@ -36,9 +36,15 @@
       # One shell instance per graphical session, like Omarchy's
       # omarchy-launch-shell (which supervises theirs from Hyprland
       # autostart; a systemd unit does the same job here).
+      #
+      # ConditionEnvironment keeps this Hyprland-only: graphical-session.target
+      # is also reached by Plasma sessions (which run their own shell), and
+      # uwsm imports/cleans XDG_CURRENT_DESKTOP around the session lifecycle,
+      # so the value is never stale.
       systemd.user.services.quickshell = {
         Unit = {
           Description = "Quickshell desktop shell";
+          ConditionEnvironment = "XDG_CURRENT_DESKTOP=Hyprland";
           PartOf = [ "graphical-session.target" ];
           After = [ "graphical-session.target" ];
         };
@@ -55,10 +61,16 @@
       # Interim polkit agent until the quickshell shell grows its own plugin
       # (Omarchy Quattro runs its polkit agent inside Quickshell). Modeled on
       # the unit the nixpkgs package ships (libexec binary, session-scoped).
+      # Same Hyprland-only condition as quickshell: Plasma ships its own
+      # polkit agent, and starting both yields "authentication agent already
+      # exists" errors.
       systemd.user.services.hyprpolkitagent = {
         Unit = {
           Description = "Hyprland Polkit Authentication Agent";
-          ConditionEnvironment = "WAYLAND_DISPLAY";
+          ConditionEnvironment = [
+            "XDG_CURRENT_DESKTOP=Hyprland"
+            "WAYLAND_DISPLAY"
+          ];
           PartOf = [ "graphical-session.target" ];
           After = [ "graphical-session.target" ];
         };

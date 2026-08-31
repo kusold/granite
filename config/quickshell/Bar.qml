@@ -85,7 +85,7 @@ PanelWindow {
 
         MouseArea {
           anchors.fill: parent
-          onClicked: Hyprland.dispatch("workspace " + modelData)
+          onClicked: service.dispatchWorkspace(modelData)
         }
       }
     }
@@ -108,6 +108,14 @@ PanelWindow {
       width: Math.min(implicitWidth, root.width * 0.3)
       elide: Text.ElideRight
     }
+  }
+
+  // Hyprland >= 0.55 with a Lua config evaluates request-socket payloads as
+  // Lua: hl.dispatch takes a dispatcher OBJECT (hl.dsp.*), so the classic
+  // "workspace 3" string form fails with a Lua syntax error — the clicks
+  // were dead since the Lua migration.
+  function dispatchWorkspace(id) {
+    Hyprland.dispatch("hl.dsp.focus({ workspace = " + id + " })")
   }
 
   // ----- Center: clock -----------------------------------------------------

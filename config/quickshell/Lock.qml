@@ -139,7 +139,7 @@ Item {
   function runWake() {
     if (displayBlanked) {
       displayBlanked = false
-      Hyprland.dispatch("dpms on")
+      dispatchDpms(true)
     }
     // locked (not lockRequested): a live config reload recreates this tree
     // with lockRequested false while the surviving WlSessionLock still
@@ -151,7 +151,15 @@ Item {
   function runBlank() {
     if (displayBlanked) return
     displayBlanked = true
-    Hyprland.dispatch("dpms off")
+    dispatchDpms(false)
+  }
+
+  // Hyprland >= 0.55 with a Lua config evaluates request-socket payloads as
+  // Lua and hl.dispatch wants a dispatcher OBJECT, so the classic
+  // "dpms on" string form is a syntax error — build the hl.dsp.* call
+  // instead (the same reason Bar.qml's workspace clicks needed fixing).
+  function dispatchDpms(on) {
+    Hyprland.dispatch(on ? "hl.dsp.dpms({ on = true })" : "hl.dsp.dpms({ on = false })")
   }
 
   Timer {

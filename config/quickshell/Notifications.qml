@@ -371,7 +371,9 @@ Item {
       var klass = String(((toplevel.lastIpcObject || {})["class"]) || "").toLowerCase()
       if (!klass) continue
       if (klass === needle || klass.indexOf(needle) !== -1 || needle.indexOf(klass) !== -1) {
-        Hyprland.dispatch("focuswindow address:" + toplevel.address)
+        // Hyprland >= 0.55 with a Lua config wants a dispatcher OBJECT
+        // (hl.dsp.*) on the request socket, not a "focuswindow addr" string.
+        Hyprland.dispatch("hl.dsp.focus({ window = \"address:" + toplevel.address + "\" })")
         return
       }
     }

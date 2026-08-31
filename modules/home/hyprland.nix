@@ -6,7 +6,7 @@
 #   M1 bar (workspaces, clock, tray)      <- done
 #   M2 notifications daemon               <- done
 #   M3 launcher / menu                    <- done
-#   M4 lock + idle
+#   M4 lock + idle                        <- done
 #   M5 clipboard history
 #   M6 background switcher / screensaver
 # Until then a few stand-ins are used (hyprpolkitagent, playerctl, plain
@@ -22,6 +22,13 @@
       # Quattro. Not using home-manager's wayland.windowManager.hyprland:
       # it generates the legacy .conf syntax.
       xdg.configFile."hypr/hyprland.lua".source = ../../config/hypr/hyprland.lua;
+
+      # M4's lock screen authenticates against the granite-lock PAM service.
+      # Home-manager cannot create PAM services, so the NixOS host ships it
+      # (security.pam.services.granite-lock — see the rockymtn host config);
+      # without it Lock.qml refuses to lock rather than lock the user out.
+      # Lock.qml's stranded-lock recovery also shells out to hyprctl, which
+      # programs.hyprland puts on the host's PATH.
 
       # Ghostty (one of Omarchy's supported terminals; their default is foot).
       xdg.configFile."ghostty/config".source = ../../config/ghostty/config;

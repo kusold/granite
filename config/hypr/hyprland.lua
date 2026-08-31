@@ -233,6 +233,7 @@ hl.animation({ leaf = "workspaces", enabled = false })
 -- Shell overlays open instantly — their own QML handles any transitions.
 -- (Omarchy applies the same treatment to their menu/launcher namespaces.)
 hl.layer_rule({ match = { namespace = "mike-launcher" }, no_anim = true, animation = "none" })
+hl.layer_rule({ match = { namespace = "mike-session" }, no_anim = true, animation = "none" })
 
 -- Window rules --------------------------------------------------------------
 -- https://wiki.hypr.land/Configuring/Basics/Window-Rules/
@@ -411,7 +412,11 @@ bind_cmd("SUPER + CTRL + N", "Toggle nightlight", "sh -c 'pkill hyprsunset || hy
 bind_cmd("SUPER + N", "Toggle do-not-disturb", "qs ipc call notifications toggleDnd")
 
 -- Session -------------------------------------------------------------------
--- TODO(shell M4): lock screen (Omarchy locks from the quickshell shell) and
--- a system/power menu live here once the shell grows those plugins.
+-- The lock screen, idle timers, and session menu (M4) live in the quickshell
+-- shell: SUPER+L locks via qs ipc (Omarchy Quattro's recipe), SUPER+SHIFT+E
+-- opens the session menu (lock, suspend, logout, reboot, shutdown — "Exit
+-- session" became its Log out entry). Idle locks after 5 minutes and
+-- suspends after 30, like Omarchy's defaults; see config/quickshell/{Lock,Idle}.qml.
 
-bind_cmd("SUPER + SHIFT + E", "Exit session", "uwsm stop", { locked = true })
+bind_cmd("SUPER + L", "Lock", "qs ipc call lock lock", { locked = true })
+bind_cmd("SUPER + SHIFT + E", "Session menu", "qs ipc call session toggle")

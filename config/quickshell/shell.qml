@@ -30,8 +30,13 @@ ShellRoot {
         required property var modelData
 
         screen: modelData
-        calendar: calendar
-        networkPanel: networkPanel
+        // The service ids are named to differ from Bar's properties on
+        // purpose: inside this Component delegate, a same-name `x: x`
+        // assignment resolves to the Bar's own null property (the scope
+        // object shadows the enclosing shell.qml id) and the click wiring
+        // dies silently. Distinct names reach the ids.
+        calendar: calendarPanel
+        networkPanel: networkPanelService
       }
     }
   }
@@ -91,13 +96,13 @@ ShellRoot {
   // M15: the calendar panel — the bar clock's click target, ported from
   // Omarchy Quattro's clock plugin (see Calendar.qml).
   Calendar {
-    id: calendar
+    id: calendarPanel
   }
 
   // M11: the network panel — connection hero, stats grid, and the Wi-Fi
   // list over Quickshell's NetworkManager service (see NetworkPanel.qml).
   // The bar's network glyph opens it too.
   NetworkPanel {
-    id: networkPanel
+    id: networkPanelService
   }
 }

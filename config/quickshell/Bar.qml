@@ -85,7 +85,10 @@ PanelWindow {
 
         MouseArea {
           anchors.fill: parent
-          onClicked: service.dispatchWorkspace(modelData)
+          // Bar.qml's root is `root`, not `service` like the service
+          // components (Launcher, Lock, …) — the undefined reference made
+          // every click throw before dispatching.
+          onClicked: root.dispatchWorkspace(modelData)
         }
       }
     }

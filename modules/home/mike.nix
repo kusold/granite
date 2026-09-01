@@ -34,7 +34,7 @@ in
           kompose
           kustomize
           mosh
-          pre-commit
+          prek
           resticprofile
           sops
           wakeonlan

@@ -1,6 +1,7 @@
 // The bar: dark top bar with workspaces and the focused window title on
 // the left, a centered clock (left click: calendar panel; right click:
-// cycle the label format), and the system tray on the right.
+// cycle the label format), and on the right the network status glyph
+// (click: network panel) beside the system tray.
 // Styling and layout follow Omarchy Quattro's bar.
 import Quickshell
 import Quickshell.Hyprland
@@ -15,6 +16,10 @@ PanelWindow {
 
   // Wired to the shell's Calendar instance by shell.qml.
   property var calendar: null
+
+  // Wired to the shell's NetworkPanel instance by shell.qml; the glyph
+  // reads its NetworkManager state directly.
+  property var networkPanel: null
 
   readonly property string fontFamily: "JetBrainsMono Nerd Font"
   readonly property color foreground: "#f2f2f2"
@@ -188,7 +193,7 @@ PanelWindow {
     }
   }
 
-  // ----- Right: system tray ------------------------------------------------
+  // ----- Right: network status + system tray ------------------------------
 
   Row {
     id: traySection
@@ -197,6 +202,34 @@ PanelWindow {
     anchors.rightMargin: 8
     anchors.verticalCenter: parent.verticalCenter
     spacing: 2
+
+    // Omarchy's network bar widget, at granite's scale: the connection
+    // glyph (wifi signal / ethernet / disconnected) straight off the
+    // panel's Networking service state, opening the panel on click.
+    Rectangle {
+      width: 24
+      height: 24
+      radius: 4
+      color: networkMouse.containsMouse ? "#33ffffff" : "transparent"
+      opacity: root.networkPanel && root.networkPanel.networkManagerAvailable ? 1 : 0.5
+
+      Text {
+        anchors.centerIn: parent
+        text: root.networkPanel ? root.networkPanel.icon : "󰤮"
+        color: root.foreground
+        font.family: root.fontFamily
+        font.pixelSize: 14
+      }
+
+      MouseArea {
+        id: networkMouse
+
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: if (root.networkPanel) root.networkPanel.toggle()
+      }
+    }
 
     Repeater {
       model: SystemTray.items

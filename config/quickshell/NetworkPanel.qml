@@ -1,6 +1,7 @@
 // M11: the network panel. SUPER+CTRL+W (bound in hyprland.lua via
-// `qs ipc call network toggle`, Omarchy Quattro's network binding) opens
-// the centered card on the focused monitor with the connection state: a
+// `qs ipc call network toggle`, Omarchy Quattro's network binding) or the
+// bar's network glyph opens the centered card on the focused monitor with
+// the connection state: a
 // hero naming what's connected (Wi-Fi SSID or Ethernet, the radio's
 // on/off switch beside it), a stats grid fed by `granite-network-status`
 // (internet ping and packet loss from a rolling sample window, live

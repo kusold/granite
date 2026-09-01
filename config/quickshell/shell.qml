@@ -31,6 +31,7 @@ ShellRoot {
 
         screen: modelData
         calendar: calendar
+        networkPanel: networkPanel
       }
     }
   }
@@ -95,5 +96,8 @@ ShellRoot {
 
   // M11: the network panel — connection hero, stats grid, and the Wi-Fi
   // list over Quickshell's NetworkManager service (see NetworkPanel.qml).
-  NetworkPanel { }
+  // The bar's network glyph opens it too.
+  NetworkPanel {
+    id: networkPanel
+  }
 }

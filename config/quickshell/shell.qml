@@ -10,7 +10,10 @@
 // keys), and the audio + media panel (MPRIS now-playing + transport over
 // the shared media service, output/input volume, default device picking),
 // and the calendar panel behind the bar clock (month grid with ISO week
-// numbers, year-progress rail — see Calendar.qml).
+// numbers, year-progress rail — see Calendar.qml), and the network panel
+// (M11's first status panel: connection hero, stats grid over
+// granite-network-status, and the Wi-Fi list over Quickshell's
+// NetworkManager service — see NetworkPanel.qml).
 //
 // The architecture follows Omarchy Quattro: a single long-running Quickshell
 // instance hosts the whole desktop; bar, launcher, notifications, lock, etc.
@@ -89,4 +92,8 @@ ShellRoot {
   Calendar {
     id: calendar
   }
+
+  // M11: the network panel — connection hero, stats grid, and the Wi-Fi
+  // list over Quickshell's NetworkManager service (see NetworkPanel.qml).
+  NetworkPanel { }
 }

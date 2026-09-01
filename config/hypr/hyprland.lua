@@ -244,6 +244,8 @@ hl.layer_rule({ match = { namespace = "mike-screensaver" }, no_anim = true, anim
 hl.layer_rule({ match = { namespace = "mike-osd" }, no_anim = true, animation = "none" })
 -- So does M8's audio + media panel.
 hl.layer_rule({ match = { namespace = "mike-audio" }, no_anim = true, animation = "none" })
+-- And M11's network panel.
+hl.layer_rule({ match = { namespace = "mike-network" }, no_anim = true, animation = "none" })
 
 -- Window rules --------------------------------------------------------------
 -- https://wiki.hypr.land/Configuring/Basics/Window-Rules/
@@ -446,6 +448,11 @@ bind_cmd("SUPER + CTRL + V", "Clipboard history", "qs ipc call clipboard toggle"
 -- is Omarchy Quattro's audio binding (their bar panel opens the same
 -- surface).
 bind_cmd("SUPER + CTRL + A", "Audio and media", "qs ipc call audio toggle")
+
+-- The network panel (M11's first status panel) lives in the quickshell
+-- shell; SUPER+CTRL+W is Omarchy Quattro's network binding (their bar
+-- widget opens the same surface).
+bind_cmd("SUPER + CTRL + W", "Network", "qs ipc call network toggle")
 
 -- Session -------------------------------------------------------------------
 -- The lock screen, idle timers, and session menu (M4) live in the quickshell

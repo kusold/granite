@@ -14,8 +14,9 @@
 #   M9 toggle framework + bar indicators: night light, DND, stay
 #      awake — one switch behind a hotkey, a menu row, and a bar glyph
 #   M10 capture flow: frozen region/window picker, screen recording
-#   M11 status panels: network, bluetooth, power, display widgets
-#      opening panels (Omarchy's Super+Ctrl+W/B/D/P bindings)
+#   M11 status panels: network done (connection hero, stats grid, wifi
+#      list); bluetooth, power, display widgets still to come — panels
+#      open with Omarchy's Super+Ctrl+W/B/D/P bindings
 #   M12 in-shell polkit agent
 #   M13 launcher extras: emoji picker, reminders, command-menu modes
 #   M14 theming: a palette singleton + theme switcher — last because
@@ -174,6 +175,25 @@
             export PATH="${lib.makeBinPath [ jq ]}:$PATH"
           ''
           + builtins.readFile ../../config/hypr/bin/granite-clipboard-capture
+        ))
+
+        # M11's network panel detail probe: NetworkPanel.qml polls it every
+        # 1.5s while open (a port of Omarchy's omarchy-network-status). The
+        # wrapper's PATH bakes the tools it parses (ip/jq/ping/iw), so it
+        # never depends on the shell service's environment — the same recipe
+        # as granite-clipboard-capture above.
+        (writeShellScriptBin "granite-network-status" (
+          ''
+            export PATH="${
+              lib.makeBinPath [
+                iproute2
+                jq
+                iputils
+                iw
+              ]
+            }:$PATH"
+          ''
+          + builtins.readFile ../../config/hypr/bin/granite-network-status
         ))
 
         # Omarchy Quattro core utilities

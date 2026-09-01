@@ -1,4 +1,4 @@
-// Quickshell desktop shell, M1 + M2 + M3 + M4 + M5 + M6 + M7 + M8: one
+// Quickshell desktop shell, M1 + M2 + M3 + M4 + M5 + M6 + M7 + M8 + M15: one
 // bar per screen (workspaces, focused window title, clock, system tray),
 // the notifications daemon (toast stack, do-not-disturb, in-memory
 // history), the launcher (fuzzy app search over desktop entries, launched
@@ -8,7 +8,9 @@
 // screensaver (per-screen wallpaper surface, thumbnail picker, idle
 // slideshow), the OSD (volume / brightness / media popups for the media
 // keys), and the audio + media panel (MPRIS now-playing + transport over
-// the shared media service, output/input volume, default device picking).
+// the shared media service, output/input volume, default device picking),
+// and the calendar panel behind the bar clock (month grid with ISO week
+// numbers, year-progress rail — see Calendar.qml).
 //
 // The architecture follows Omarchy Quattro: a single long-running Quickshell
 // instance hosts the whole desktop; bar, launcher, notifications, lock, etc.
@@ -25,6 +27,7 @@ ShellRoot {
         required property var modelData
 
         screen: modelData
+        calendar: calendar
       }
     }
   }
@@ -79,5 +82,11 @@ ShellRoot {
   AudioPanel {
     media: media
     osd: osd
+  }
+
+  // M15: the calendar panel — the bar clock's click target, ported from
+  // Omarchy Quattro's clock plugin (see Calendar.qml).
+  Calendar {
+    id: calendar
   }
 }

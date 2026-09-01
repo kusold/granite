@@ -1,5 +1,6 @@
-// The bar: dark top bar with workspaces and the focused window title on the
-// left, a centered clock, and the system tray on the right.
+// The bar: dark top bar with workspaces and the focused window title on
+// the left, a centered clock (left click: calendar panel; right click:
+// cycle the label format), and the system tray on the right.
 // Styling and layout follow Omarchy Quattro's bar.
 import Quickshell
 import Quickshell.Hyprland
@@ -7,9 +8,13 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Services.SystemTray
 import QtQuick
+import "CalendarModel.js" as Model
 
 PanelWindow {
   id: root
+
+  // Wired to the shell's Calendar instance by shell.qml.
+  property var calendar: null
 
   readonly property string fontFamily: "JetBrainsMono Nerd Font"
   readonly property color foreground: "#f2f2f2"
@@ -126,16 +131,61 @@ PanelWindow {
   SystemClock {
     id: clock
 
-    precision: SystemClock.Minutes
+    // A seconds label needs the clock to tick sixty times as often, and a
+    // repaint a second is a price only the formats that print seconds pay.
+    precision: Model.clockNeedsSeconds(root.clockFormat) ? SystemClock.Seconds : SystemClock.Minutes
   }
 
-  Text {
+  // Omarchy's default clock format; right-click walks their format ring.
+  // Session-only — there is no shell.json settings store here to persist a
+  // cycled format into.
+  property string clockFormat: "dddd HH:mm"
+
+  function clockText() {
+    // Qt has no ISO week specifier of its own; stand the number in before
+    // formatting the 'W'ww preset.
+    var format = root.clockFormat.replace(/ww/g, function() {
+      return Model.isoWeekLiteral(clock.date.getFullYear(), clock.date.getMonth(), clock.date.getDate())
+    })
+    return Qt.formatDateTime(clock.date, format)
+  }
+
+  Rectangle {
+    id: clockButton
+
     anchors.centerIn: parent
-    // Omarchy's default clock format.
-    text: Qt.formatDateTime(clock.date, "dddd HH:mm")
-    color: root.foreground
-    font.family: root.fontFamily
-    font.pixelSize: 13
+    width: clockLabel.implicitWidth + 18
+    height: 22
+    radius: 4
+    color: clockMouse.containsMouse ? "#33ffffff" : "transparent"
+
+    Text {
+      id: clockLabel
+
+      anchors.centerIn: parent
+      text: root.clockText()
+      color: root.foreground
+      font.family: root.fontFamily
+      font.pixelSize: 13
+    }
+
+    MouseArea {
+      id: clockMouse
+
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+      acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+      // Left click asks "what is the date?" and gets the calendar; right
+      // click walks the label formats.
+      onClicked: function(mouse) {
+        if (mouse.button === Qt.RightButton)
+          root.clockFormat = Model.nextClockFormat(root.clockFormat)
+        else if (root.calendar)
+          root.calendar.toggle()
+      }
+    }
   }
 
   // ----- Right: system tray ------------------------------------------------

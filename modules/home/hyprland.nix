@@ -20,6 +20,8 @@
 #   M13 launcher extras: emoji picker, reminders, command-menu modes
 #   M14 theming: a palette singleton + theme switcher — last because
 #      it touches every QML file's hardcoded colors
+#   M15 clock panel (calendar): month grid with ISO week gutter,
+#      year-progress rail, week-start toggle <- done
 # Deliberately off the roadmap: Omarchy's plugin/manifest platform and
 # their AI agents panel (the shell stays personal, not a platform).
 # Stand-ins until their milestone lands: the pkill

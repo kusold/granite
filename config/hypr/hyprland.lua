@@ -242,6 +242,8 @@ hl.layer_rule({ match = { namespace = "mike-background-picker" }, no_anim = true
 hl.layer_rule({ match = { namespace = "mike-screensaver" }, no_anim = true, animation = "none" })
 -- The OSD joins them: its progress bar animates itself, in QML.
 hl.layer_rule({ match = { namespace = "mike-osd" }, no_anim = true, animation = "none" })
+-- So does M8's audio + media panel.
+hl.layer_rule({ match = { namespace = "mike-audio" }, no_anim = true, animation = "none" })
 
 -- Window rules --------------------------------------------------------------
 -- https://wiki.hypr.land/Configuring/Basics/Window-Rules/
@@ -390,12 +392,14 @@ bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
 bind("SUPER + ALT + G", "Move active window out of group", hl.dsp.window.move({ out_of_group = true }))
 
 -- Media keys ----------------------------------------------------------------
--- The OSD (M7) lives in the quickshell shell: the keys call into it via qs
--- ipc and it both acts and shows the popup — volume through its pipewire
--- service (so a headset's volume wheel pops the same OSD), brightness
--- through brightnessctl, media through its MPRIS player. (Omarchy routes
--- these through their omarchy-audio-output-volume / omarchy-brightness-
--- display / omarchy-shell media wrappers instead.)
+-- Volume and brightness act through the OSD (M7): the keys call into it
+-- via qs ipc and it both acts and shows the popup — volume through its
+-- pipewire service (so a headset's volume wheel pops the same OSD),
+-- brightness through brightnessctl. The media keys act through the media
+-- service (M8's Media.qml, grown out of the OSD): its player ladder picks
+-- the target and it calls back into the OSD for the popup. (Omarchy
+-- routes these through their omarchy-audio-output-volume /
+-- omarchy-brightness-display / omarchy-shell media wrappers instead.)
 
 bind_cmd("XF86AudioRaiseVolume", "Volume up", "qs ipc call osd volumeUp", { locked = true, repeating = true })
 bind_cmd("XF86AudioLowerVolume", "Volume down", "qs ipc call osd volumeDown", { locked = true, repeating = true })
@@ -405,10 +409,10 @@ bind_cmd("XF86AudioMicMute", "Mute microphone", "qs ipc call osd micMute", { loc
 bind_cmd("XF86MonBrightnessUp", "Brightness up", "qs ipc call osd brightnessUp", { locked = true, repeating = true })
 bind_cmd("XF86MonBrightnessDown", "Brightness down", "qs ipc call osd brightnessDown", { locked = true, repeating = true })
 
-bind_cmd("XF86AudioPlay", "Play", "qs ipc call osd media playPause", { locked = true })
-bind_cmd("XF86AudioPause", "Pause", "qs ipc call osd media playPause", { locked = true })
-bind_cmd("XF86AudioNext", "Next track", "qs ipc call osd media next", { locked = true })
-bind_cmd("XF86AudioPrev", "Previous track", "qs ipc call osd media previous", { locked = true })
+bind_cmd("XF86AudioPlay", "Play", "qs ipc call media playPause", { locked = true })
+bind_cmd("XF86AudioPause", "Pause", "qs ipc call media playPause", { locked = true })
+bind_cmd("XF86AudioNext", "Next track", "qs ipc call media next", { locked = true })
+bind_cmd("XF86AudioPrev", "Previous track", "qs ipc call media previous", { locked = true })
 
 -- Utilities -----------------------------------------------------------------
 
@@ -437,6 +441,11 @@ bind_cmd("SUPER + N", "Toggle do-not-disturb", "qs ipc call notifications toggle
 -- The clipboard history (M5) lives in the quickshell shell; SUPER+CTRL+V is
 -- Omarchy's clipboard manager binding.
 bind_cmd("SUPER + CTRL + V", "Clipboard history", "qs ipc call clipboard toggle")
+
+-- The audio + media panel (M8) lives in the quickshell shell; SUPER+CTRL+A
+-- is Omarchy Quattro's audio binding (their bar panel opens the same
+-- surface).
+bind_cmd("SUPER + CTRL + A", "Audio and media", "qs ipc call audio toggle")
 
 -- Session -------------------------------------------------------------------
 -- The lock screen, idle timers, and session menu (M4) live in the quickshell

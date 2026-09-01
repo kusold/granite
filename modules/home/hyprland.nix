@@ -10,12 +10,12 @@
 #   M5 clipboard history                  <- done
 #   M6 background switcher / screensaver  <- done
 #   M7 OSD: volume / brightness / media   <- done
-#   M8 audio + media panel: MPRIS now-playing, sink controls
+#   M8 audio + media panel: MPRIS now-playing, sink controls <- done
 #   M9 toggle framework + bar indicators: night light, DND, stay
 #      awake — one switch behind a hotkey, a menu row, and a bar glyph
 #   M10 capture flow: frozen region/window picker, screen recording
 #   M11 status panels: network, bluetooth, power, display widgets
-#      opening panels (Omarchy's Super+Ctrl+A/W/B/D/P bindings)
+#      opening panels (Omarchy's Super+Ctrl+W/B/D/P bindings)
 #   M12 in-shell polkit agent
 #   M13 launcher extras: emoji picker, reminders, command-menu modes
 #   M14 theming: a palette singleton + theme switcher — last because

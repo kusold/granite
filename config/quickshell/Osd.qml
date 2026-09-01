@@ -2,36 +2,40 @@
 // brightness, and media popups surface over the focused monitor's bottom
 // edge for a beat, like Omarchy Quattro's OSD.
 //
-// The keys are bound in hyprland.lua to `qs ipc call osd …` and the shell
-// does the work behind them: volume moves through Quickshell's pipewire
-// service (the PwObjectTracker keeps the default sink/source bound, and
-// the watch on their audio properties means a headset's volume wheel pops
-// the same popup the keyboard does), brightness goes through brightnessctl
-// — Quickshell has no backlight service, and only class "backlight"
+// The keys are bound in hyprland.lua to `qs ipc call osd …` (and the
+// media keys to `qs ipc call media …`) and the shell does the work
+// behind them: volume moves through Quickshell's pipewire service (the
+// PwObjectTracker keeps the default sink/source bound, and the watch on
+// their audio properties means a headset's volume wheel pops the same
+// popup the keyboard does), brightness goes through brightnessctl —
+// Quickshell has no backlight service, and only class "backlight"
 // devices count, so the wifi LED brightnessctl would otherwise pick on
 // desktop hosts is left alone — and media acts through the MPRIS service
-// that M8's media panel will grow from.
+// (Media.qml) that M8 grew out of this file: the media keys call its IPC,
+// it runs the player ladder and calls back here for the popup. The audio
+// panel holds the volume popup while it is open — its own sliders are
+// the display then.
 //
 // Omarchy behaviors kept here, simplified: the popup geometry (bottom
 // center card — icon, progress bar, readout — or icon + message), the
-// progress bar's settle animation, waiting for next/previous to actually
-// change tracks before showing the popup (so it names the new track, not
-// the old one), preferring whatever has been playing longest over the
-// last player the keys touched, and a generic `show` IPC for scripts
+// progress bar's settle animation, and a generic `show` IPC for scripts
 // (their omarchy-osd CLI's payload). Deliberately NOT here vs Omarchy:
 // that CLI wrapper (qs ipc is granite's equivalent), keyboard-backlight
-// and DDC display brightness, the mic-mute LED, and playerctld
-// proxy-player special casing — M8 revisits the player picking.
+// and DDC display brightness, and the mic-mute LED. The player picking
+// and next/previous track waiting live in Media.qml since M8.
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import QtQuick
 
 Item {
   id: service
+
+  // Wired to the shell's Media instance by shell.qml: media feedback is
+  // this OSD's popup, media state is the Media service's business.
+  property var media: null
 
   // Palette shared with Bar.qml.
   readonly property string fontFamily: "JetBrainsMono Nerd Font"
@@ -142,8 +146,11 @@ Item {
   // External volume changes (headset wheels, pavucontrol) pop the same
   // popup the keys do. Armed a beat after startup so the initial pipewire
   // bind doesn't pop one at login; a sink switch mid-session still gets
-  // its immediate first-change popup, which is useful feedback.
+  // its immediate first-change popup, which is useful feedback. M8's
+  // audio panel holds the popup while it is open — its own sliders are
+  // the display then.
   property bool volumeWatchArmed: false
+  property bool volumePopupHeld: false
 
   Timer {
     interval: 3000
@@ -155,11 +162,11 @@ Item {
     target: service.sink !== null ? service.sink.audio : null
 
     function onVolumesChanged() {
-      if (service.volumeWatchArmed) service.showVolume()
+      if (service.volumeWatchArmed && !service.volumePopupHeld) service.showVolume()
     }
 
     function onMutedChanged() {
-      if (service.volumeWatchArmed) service.showVolume()
+      if (service.volumeWatchArmed && !service.volumePopupHeld) service.showVolume()
     }
   }
 
@@ -277,219 +284,6 @@ Item {
     }
   }
 
-  // ----- media --------------------------------------------------------------
-  //
-  // The media keys act on the "active" player: whatever has been playing
-  // longest, else the last player the keys touched, else the first
-  // controllable one. Omarchy's full ladder also ranks stream-backed and
-  // metadata-having players in between; M8's media panel grows that.
-
-  readonly property var players: Mpris.players ? Mpris.players.values : []
-
-  property string preferredPlayerKey: ""
-  property var playingOrder: ({})
-  property int playSerial: 0
-
-  function playerKey(player) {
-    return player && player.dbusName ? String(player.dbusName) : ""
-  }
-
-  function playerByKey(key) {
-    if (!key) return null
-    for (var i = 0; i < players.length; i++)
-      if (playerKey(players[i]) === key) return players[i]
-    return null
-  }
-
-  // Reactive start-of-playback ordering (Omarchy's syncPlayingOrder shape:
-  // recomputed from the players' own isPlaying signals, never polled).
-  Instantiator {
-    model: service.players
-
-    delegate: Connections {
-      required property var modelData
-
-      target: modelData
-
-      function onIsPlayingChanged() {
-        service.notePlaying(modelData)
-      }
-    }
-  }
-
-  function notePlaying(player) {
-    if (!player) return
-    var key = playerKey(player)
-    if (!key) return
-    if (player.isPlaying) {
-      if (playingOrder[key] === undefined) playingOrder[key] = ++playSerial
-    } else {
-      delete playingOrder[key]
-    }
-  }
-
-  function activePlayer() {
-    var best = null
-    var bestSerial = Infinity
-    for (var i = 0; i < players.length; i++) {
-      var key = playerKey(players[i])
-      if (players[i].isPlaying && playingOrder[key] !== undefined && playingOrder[key] < bestSerial) {
-        best = players[i]
-        bestSerial = playingOrder[key]
-      }
-    }
-    if (best !== null) return best
-    var preferred = playerByKey(preferredPlayerKey)
-    if (preferred !== null) return preferred
-    for (var j = 0; j < players.length; j++)
-      if (canHandle(players[j], "playPause")) return players[j]
-    return null
-  }
-
-  function canHandle(player, action) {
-    if (!player) return false
-    if (action === "next") return !!player.canGoNext
-    if (action === "previous") return !!player.canGoPrevious
-    if (action === "play") return !!player.canPlay || (!!player.canTogglePlaying && !player.isPlaying)
-    if (action === "pause") return !!player.canPause || (!!player.canTogglePlaying && player.isPlaying)
-    if (action === "playPause")
-      return !!player.canTogglePlaying || !!player.canPlay || !!player.canPause
-    return false
-  }
-
-  function trackSignature(player) {
-    if (!player) return ""
-    return [
-      player.trackTitle || "",
-      player.trackArtist || "",
-      player.trackAlbum || "",
-      player.trackArtUrl || ""
-    ].join("\u001f")
-  }
-
-  // The icon carries the action; the message carries "Title - Artist" (the
-  // player identity when the track has none) and only falls back to the
-  // action label when there is nothing to name.
-  function mediaMessage(player, fallback) {
-    if (!player) return fallback
-    var label = player.trackTitle || player.identity || player.desktopEntry || ""
-    if (label.length > 0 && player.trackArtist) return label + " - " + player.trackArtist
-    return label.length > 0 ? label : fallback
-  }
-
-  function showMediaOsd(actionLabel, key, player) {
-    showMessage(key, mediaMessage(player, actionLabel))
-  }
-
-  // next/previous race the player's metadata update; wait briefly for the
-  // new track (Omarchy's pendingTrackOsd) so the popup names it.
-  property var pendingTrackOsd: null
-
-  Timer {
-    id: trackOsdTimer
-
-    interval: 120
-    onTriggered: service.flushPendingTrackOsd()
-  }
-
-  function scheduleMediaOsd(actionLabel, key, player, waitForTrack, beforeSignature) {
-    if (waitForTrack) {
-      pendingTrackOsd = {
-        actionLabel: actionLabel,
-        key: key,
-        playerKey: playerKey(player),
-        before: beforeSignature,
-        attempts: 0
-      }
-      trackOsdTimer.restart()
-    } else {
-      showMediaOsd(actionLabel, key, player)
-    }
-  }
-
-  function flushPendingTrackOsd() {
-    var pending = pendingTrackOsd
-    if (!pending) return
-    // The player may have died mid-wait; the fallback label still shows.
-    var player = playerByKey(pending.playerKey)
-    if (player === null || trackSignature(player) !== pending.before || pending.attempts >= 10) {
-      pendingTrackOsd = null
-      showMediaOsd(pending.actionLabel, pending.key, player)
-      return
-    }
-    pending.attempts += 1
-    pendingTrackOsd = pending
-    trackOsdTimer.restart()
-  }
-
-  function mediaAction(action) {
-    var player = activePlayer()
-    if (!canHandle(player, action)) {
-      // Dead keys look broken; say so instead.
-      showMessage("media", "No media player")
-      return "none"
-    }
-
-    var label = "Play/pause"
-    var key = "media"
-    var before = trackSignature(player)
-    var handled = false
-
-    if (action === "next") {
-      label = "Next"
-      key = "media-next"
-      if (player.canGoNext) {
-        player.next()
-        handled = true
-      }
-    } else if (action === "previous") {
-      label = "Previous"
-      key = "media-previous"
-      if (player.canGoPrevious) {
-        player.previous()
-        handled = true
-      }
-    } else if (action === "play") {
-      label = "Play"
-      key = "media-play"
-      if (player.canPlay) {
-        player.play()
-        handled = true
-      } else if (player.canTogglePlaying && !player.isPlaying) {
-        player.togglePlaying()
-        handled = true
-      }
-    } else if (action === "pause") {
-      label = "Pause"
-      key = "media-pause"
-      if (player.canPause) {
-        player.pause()
-        handled = true
-      } else if (player.canTogglePlaying && player.isPlaying) {
-        player.togglePlaying()
-        handled = true
-      }
-    } else {
-      label = player.isPlaying ? "Pause" : "Play"
-      key = player.isPlaying ? "media-pause" : "media-play"
-      if (player.isPlaying && player.canPause) {
-        player.pause()
-        handled = true
-      } else if (!player.isPlaying && player.canPlay) {
-        player.play()
-        handled = true
-      } else if (player.canTogglePlaying) {
-        player.togglePlaying()
-        handled = true
-      }
-    }
-
-    if (handled) preferredPlayerKey = playerKey(player)
-    scheduleMediaOsd(label, key, player,
-      handled && (action === "next" || action === "previous"), before)
-    return handled ? "ok" : "none"
-  }
-
   // ----- generic show -------------------------------------------------------
   //
   // For scripts: `qs ipc call osd show '{"icon":"mic","message":"…"}'` or
@@ -543,10 +337,6 @@ Item {
       return service.brightnessDown()
     }
 
-    function media(action: string): string {
-      return service.mediaAction(action)
-    }
-
     function show(payloadJson: string): string {
       return service.showPayload(payloadJson)
     }
@@ -558,7 +348,6 @@ Item {
 
     function status(): string {
       var percent = service.sinkPercent()
-      var active = service.activePlayer()
       return JSON.stringify({
         opened: service.opened,
         iconKey: service.iconKey,
@@ -567,8 +356,8 @@ Item {
         hasProgress: service.hasProgress,
         sinkPercent: percent,
         sinkMuted: percent >= 0 ? service.sink.audio.muted : false,
-        players: service.players.length,
-        activePlayer: active !== null ? service.mediaMessage(active, "") : ""
+        players: service.media !== null ? service.media.players.length : 0,
+        activePlayer: service.media !== null ? service.media.mediaMessage(service.media.activePlayer, "") : ""
       })
     }
 

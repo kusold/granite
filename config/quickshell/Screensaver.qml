@@ -13,7 +13,7 @@
 // idle clock gives granite that for free). Locking hides it — the
 // ext-session-lock surface takes the outputs anyway.
 //
-// On demand: SUPER+Esc and the session menu's Screensaver row (both via
+// On demand: SUPER+Escape and the session menu's Screensaver row (both via
 // `qs ipc call screensaver start`).
 import Quickshell
 import Quickshell.Io

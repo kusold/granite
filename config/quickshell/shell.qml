@@ -62,7 +62,11 @@ ShellRoot {
 
   // M7: the OSD — volume / brightness / media popups for the media keys
   // (see Osd.qml).
-  Osd { id: osd }
+  Osd {
+    id: osd
+
+    media: media
+  }
 
   // M8: the media service — the MPRIS player ladder shared by the OSD's
   // media keys, the panel below, and scripts (see Media.qml) — and the

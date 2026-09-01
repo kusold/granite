@@ -240,6 +240,8 @@ hl.layer_rule({ match = { namespace = "mike-clipboard" }, no_anim = true, animat
 hl.layer_rule({ match = { namespace = "mike-background" }, no_anim = true, animation = "none" })
 hl.layer_rule({ match = { namespace = "mike-background-picker" }, no_anim = true, animation = "none" })
 hl.layer_rule({ match = { namespace = "mike-screensaver" }, no_anim = true, animation = "none" })
+-- The OSD joins them: its progress bar animates itself, in QML.
+hl.layer_rule({ match = { namespace = "mike-osd" }, no_anim = true, animation = "none" })
 
 -- Window rules --------------------------------------------------------------
 -- https://wiki.hypr.land/Configuring/Basics/Window-Rules/
@@ -388,22 +390,25 @@ bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
 bind("SUPER + ALT + G", "Move active window out of group", hl.dsp.window.move({ out_of_group = true }))
 
 -- Media keys ----------------------------------------------------------------
--- pamixer/brightnessctl stand in for Omarchy's omarchy-audio-* and
--- omarchy-brightness-* wrappers; playerctl for their shell MPRIS panel
--- until M8's media panel (M7's OSD adds the popups these keys lack).
+-- The OSD (M7) lives in the quickshell shell: the keys call into it via qs
+-- ipc and it both acts and shows the popup — volume through its pipewire
+-- service (so a headset's volume wheel pops the same OSD), brightness
+-- through brightnessctl, media through its MPRIS player. (Omarchy routes
+-- these through their omarchy-audio-output-volume / omarchy-brightness-
+-- display / omarchy-shell media wrappers instead.)
 
-bind_cmd("XF86AudioRaiseVolume", "Volume up", "pamixer -i 5", { locked = true, repeating = true })
-bind_cmd("XF86AudioLowerVolume", "Volume down", "pamixer -d 5", { locked = true, repeating = true })
-bind_cmd("XF86AudioMute", "Mute", "pamixer -t", { locked = true })
-bind_cmd("XF86AudioMicMute", "Mute microphone", "pamixer --default-source -t", { locked = true })
+bind_cmd("XF86AudioRaiseVolume", "Volume up", "qs ipc call osd volumeUp", { locked = true, repeating = true })
+bind_cmd("XF86AudioLowerVolume", "Volume down", "qs ipc call osd volumeDown", { locked = true, repeating = true })
+bind_cmd("XF86AudioMute", "Mute", "qs ipc call osd volumeMute", { locked = true })
+bind_cmd("XF86AudioMicMute", "Mute microphone", "qs ipc call osd micMute", { locked = true })
 
-bind_cmd("XF86MonBrightnessUp", "Brightness up", "brightnessctl set +5%", { locked = true, repeating = true })
-bind_cmd("XF86MonBrightnessDown", "Brightness down", "brightnessctl set 5%-", { locked = true, repeating = true })
+bind_cmd("XF86MonBrightnessUp", "Brightness up", "qs ipc call osd brightnessUp", { locked = true, repeating = true })
+bind_cmd("XF86MonBrightnessDown", "Brightness down", "qs ipc call osd brightnessDown", { locked = true, repeating = true })
 
-bind_cmd("XF86AudioPlay", "Play", "playerctl play-pause", { locked = true })
-bind_cmd("XF86AudioPause", "Pause", "playerctl play-pause", { locked = true })
-bind_cmd("XF86AudioNext", "Next track", "playerctl next", { locked = true })
-bind_cmd("XF86AudioPrev", "Previous track", "playerctl previous", { locked = true })
+bind_cmd("XF86AudioPlay", "Play", "qs ipc call osd media playPause", { locked = true })
+bind_cmd("XF86AudioPause", "Pause", "qs ipc call osd media playPause", { locked = true })
+bind_cmd("XF86AudioNext", "Next track", "qs ipc call osd media next", { locked = true })
+bind_cmd("XF86AudioPrev", "Previous track", "qs ipc call osd media previous", { locked = true })
 
 -- Utilities -----------------------------------------------------------------
 

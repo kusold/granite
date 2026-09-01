@@ -1,11 +1,12 @@
-// Quickshell desktop shell, M1 + M2 + M3 + M4 + M5 + M6: one bar per screen
-// (workspaces, focused window title, clock, system tray), the notifications
-// daemon (toast stack, do-not-disturb, in-memory history), the launcher
-// (fuzzy app search over desktop entries, launched through uwsm), the lock
-// screen (ext-session-lock + PAM), the idle policy (lock / suspend timers),
-// the session menu (power actions), the clipboard history (wl-paste
-// capture, searchable picker), and the background + screensaver (per-screen
-// wallpaper surface, thumbnail picker, idle slideshow).
+// Quickshell desktop shell, M1 + M2 + M3 + M4 + M5 + M6 + M7: one bar per
+// screen (workspaces, focused window title, clock, system tray), the
+// notifications daemon (toast stack, do-not-disturb, in-memory history),
+// the launcher (fuzzy app search over desktop entries, launched through
+// uwsm), the lock screen (ext-session-lock + PAM), the idle policy (lock /
+// suspend timers), the session menu (power actions), the clipboard history
+// (wl-paste capture, searchable picker), the background + screensaver
+// (per-screen wallpaper surface, thumbnail picker, idle slideshow), and
+// the OSD (volume / brightness / media popups for the media keys).
 //
 // The architecture follows Omarchy Quattro: a single long-running Quickshell
 // instance hosts the whole desktop; bar, launcher, notifications, lock, etc.
@@ -56,4 +57,8 @@ ShellRoot {
     background: background
     lock: lock
   }
+
+  // M7: the OSD — volume / brightness / media popups for the media keys
+  // (see Osd.qml).
+  Osd { }
 }

@@ -9,7 +9,7 @@
 #   M4 lock + idle                        <- done
 #   M5 clipboard history                  <- done
 #   M6 background switcher / screensaver  <- done
-#   M7 OSD: volume / brightness / media popups for the media keys
+#   M7 OSD: volume / brightness / media   <- done
 #   M8 audio + media panel: MPRIS now-playing, sink controls
 #   M9 toggle framework + bar indicators: night light, DND, stay
 #      awake — one switch behind a hotkey, a menu row, and a bar glyph
@@ -22,9 +22,12 @@
 #      it touches every QML file's hardcoded colors
 # Deliberately off the roadmap: Omarchy's plugin/manifest platform and
 # their AI agents panel (the shell stays personal, not a platform).
-# Stand-ins until their milestone lands: playerctl (M8), the pkill
+# Stand-ins until their milestone lands: the pkill
 # hyprsunset toggle (M9), plain grim/slurp captures (M10),
 # hyprpolkitagent (M12) — see config/hypr/hyprland.lua TODOs.
+# (M7 moved the volume and media keys into the shell — pipewire and MPRIS
+# — so only brightnessctl remains a keybind backend: Quickshell has no
+# backlight service.)
 #
 # Exports: flake.modules.homeManager.hyprland
 { ... }:
@@ -173,11 +176,11 @@
 
         # Omarchy Quattro core utilities
         wl-clipboard # clipboard: wl-paste --watch feeds M5's history, wl-copy serves the picker's selections
-        pamixer
-        brightnessctl
+        pamixer # CLI volume mixer; the media keys drive the shell's pipewire service since M7
+        brightnessctl # M7's OSD brightness backend (the shell shells out to it: no backlight service in Quickshell)
         hyprsunset # night light
         hyprpicker # color picker
-        playerctl # interim MPRIS control until M8's media panel
+        playerctl # CLI MPRIS control; the media keys drive the shell's Mpris service since M7
       ];
     };
 }

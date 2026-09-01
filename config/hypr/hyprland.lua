@@ -430,10 +430,10 @@ bind_cmd("SUPER + CTRL + N", "Toggle nightlight", "sh -c 'pkill hyprsunset || hy
 
 -- The background switcher and screensaver (M6) live in the quickshell
 -- shell: SUPER+CTRL+SPACE opens the background picker (Omarchy Quattro's
--- binding; a desktop double-click opens it too), SUPER+ESC starts the
+-- binding; a desktop double-click opens it too), SUPER+Esc starts the
 -- screensaver on demand (their System > Screensaver entry).
 bind_cmd("SUPER + CTRL + SPACE", "Background switcher", "qs ipc call background toggle")
-bind_cmd("SUPER + ESC", "Screensaver", "qs ipc call screensaver start")
+bind_cmd("SUPER + Esc", "Screensaver", "qs ipc call screensaver start")
 
 -- The quickshell shell is the notifications daemon (M2); qs ipc talks to it.
 bind_cmd("SUPER + N", "Toggle do-not-disturb", "qs ipc call notifications toggleDnd")

@@ -1,0 +1,429 @@
+# granite-keybindings — every Hyprland keybind in a searchable menu, a port
+# of Omarchy's `omarchy-menu-keybindings`
+# (https://github.com/basecamp/omarchy, MIT): SUPER+K there, SUPER+K here
+# (bound in config/hypr/hyprland.lua). Rows pair a chord with its
+# description from the config; Enter dispatches the picked row through
+# `hyprctl dispatch`, Escape closes. `--print` lists the binds to stdout
+# instead — what their `omarchy menu keybindings --print` is for.
+#
+# Sources, in the order they're trusted:
+#   * `hyprctl binds` — the live bind table, in config order (which is the
+#     curated order: apps, tiling, media, utilities, session). Plain text,
+#     not `hyprctl -j binds`: Hyprland 0.56 emits invalid JSON there, and
+#     older versions broke on quotes in args.
+#   * the Lua source cache — the config's Lua binds report as dispatcher
+#     __lua with an opaque arg, so ~/.config/hypr/hyprland.lua is also run
+#     under a stub `hl` that records what each hl.bind() saw: the real
+#     dispatcher expression behind every row (what Enter runs). lua and jq
+#     arrive through the nixpkgs wrapper's PATH (modules/home/hyprland.nix);
+#     without lua the list still renders, only dispatch goes quiet.
+#   * a static keycode table — Hyprland reports Lua code: binds with the
+#     modifiers baked into the key field ("SUPER + code:10"), which resolves
+#     to the keycap symbol for the keys this config binds (the number row).
+#     Anything else shows as code:N rather than guessing at the layout.
+#
+# Records are tab-separated: chord, description, dispatcher, arg. Alternate
+# chords that run the same dispatcher and arg share a row ("SUPER + W /
+# SUPER + Q"), the close-window and scratchpad pairs this config binds on
+# purpose. Output is cached under ~/.cache/granite keyed on the bind
+# table's hash, so the second SUPER+K is instant.
+
+declare -A LUA_BIND_KEY_MAP
+declare -A LUA_BIND_DISPATCHER_MAP
+declare -A LUA_BIND_ARG_MAP
+
+build_lua_bind_cache() {
+  command -v lua >/dev/null 2>&1 || return 0
+
+  while IFS=$'\t' read -r modmask description key dispatcher arg; do
+    [[ -z $modmask || -z $description || -z $key ]] && continue
+
+    LUA_BIND_KEY_MAP["$modmask,$description"]="$key"
+    cache_key="$modmask,$description,$key"
+    LUA_BIND_DISPATCHER_MAP["$cache_key"]="$dispatcher"
+    LUA_BIND_ARG_MAP["$cache_key"]="$arg"
+  done < <(
+    lua <<'LUA'
+-- Omarchy's trick: run the real config against a stub `hl` that records
+-- what hl.bind() sees. Everything else is a swallowing noop, so loading
+-- the config has no side effects.
+local modifiers = { SHIFT = 1, CTRL = 4, CONTROL = 4, ALT = 8, SUPER = 64 }
+
+local function split_keys(keys)
+  local modmask = 0
+  local key = ""
+
+  for part in string.gmatch(tostring(keys or ""), "[^+]+") do
+    local value = part:gsub("^%s+", ""):gsub("%s+$", "")
+    local modifier = modifiers[string.upper(value)]
+
+    if modifier then
+      modmask = modmask + modifier
+    else
+      key = value
+    end
+  end
+
+  return modmask, key
+end
+
+local function lua_literal(value)
+  local value_type = type(value)
+
+  if value_type == "string" then
+    return string.format("%q", value)
+  elseif value_type == "number" or value_type == "boolean" then
+    return tostring(value)
+  elseif value_type == "table" then
+    local parts = {}
+    local keys = {}
+    local array_length = #value
+
+    for index = 1, array_length do
+      parts[#parts + 1] = lua_literal(value[index])
+    end
+
+    for key in pairs(value) do
+      if not (type(key) == "number" and key >= 1 and key <= array_length and math.floor(key) == key) then
+        keys[#keys + 1] = key
+      end
+    end
+
+    table.sort(keys, function(left, right)
+      return tostring(left) < tostring(right)
+    end)
+
+    for _, key in ipairs(keys) do
+      local key_prefix
+      if type(key) == "string" and key:match("^[%a_][%w_]*$") then
+        key_prefix = key .. " = "
+      else
+        key_prefix = "[" .. lua_literal(key) .. "] = "
+      end
+
+      parts[#parts + 1] = key_prefix .. lua_literal(value[key])
+    end
+
+    return "{ " .. table.concat(parts, ", ") .. " }"
+  else
+    return "nil"
+  end
+end
+
+local function call_expression(path, ...)
+  local args = {}
+
+  for index = 1, select("#", ...) do
+    args[index] = lua_literal(select(index, ...))
+  end
+
+  return path .. "(" .. table.concat(args, ", ") .. ")"
+end
+
+local function dispatcher(kind, arg, expr)
+  return {
+    __granite_dispatcher = true,
+    kind = kind or "",
+    arg = arg or "",
+    expr = expr or "",
+  }
+end
+
+local function dsp_proxy(path)
+  return setmetatable({ path = path }, {
+    __index = function(self, key)
+      return dsp_proxy(self.path .. "." .. tostring(key))
+    end,
+    __call = function(self, ...)
+      local first_arg = ...
+      local expr = call_expression(self.path, ...)
+
+      if self.path == "hl.dsp.exec_cmd" and type(first_arg) == "string" then
+        return dispatcher("exec", first_arg, expr)
+      end
+
+      return dispatcher("lua", expr, expr)
+    end,
+  })
+end
+
+local noop
+noop = setmetatable({}, {
+  __index = function()
+    return noop
+  end,
+  __call = function()
+    return noop
+  end,
+})
+
+hl = setmetatable({
+  dsp = dsp_proxy("hl.dsp"),
+  bind = function(keys, bind_dispatcher, opts)
+    opts = opts or {}
+
+    if opts.description and opts.description ~= "" then
+      local modmask, key = split_keys(keys)
+      local kind = ""
+      local arg = ""
+
+      if type(bind_dispatcher) == "table" and bind_dispatcher.__granite_dispatcher then
+        kind = bind_dispatcher.kind or ""
+        arg = bind_dispatcher.arg or bind_dispatcher.expr or ""
+      elseif type(bind_dispatcher) == "string" and bind_dispatcher ~= "" then
+        kind = "exec"
+        arg = bind_dispatcher
+      end
+
+      print(table.concat({ tostring(modmask), opts.description, key, kind, arg }, "\t"))
+    end
+
+    return noop
+  end,
+}, {
+  __index = function()
+    return noop
+  end,
+})
+
+local config = os.getenv("HOME") .. "/.config/hypr/hyprland.lua"
+local file = io.open(config, "r")
+
+if file then
+  file:close()
+  local ok, err = pcall(dofile, config)
+  if not ok and os.getenv("DEBUG") == "1" then
+    io.stderr:write("[DEBUG] lua bind scan failed: " .. tostring(err) .. "\n")
+  end
+end
+LUA
+  )
+}
+
+modmask_to_text() {
+  case "$1" in
+    0)  printf '' ;;
+    1)  printf 'SHIFT' ;;
+    4)  printf 'CTRL' ;;
+    5)  printf 'SHIFT CTRL' ;;
+    8)  printf 'ALT' ;;
+    9)  printf 'SHIFT ALT' ;;
+    12) printf 'CTRL ALT' ;;
+    13) printf 'SHIFT CTRL ALT' ;;
+    64) printf 'SUPER' ;;
+    65) printf 'SUPER SHIFT' ;;
+    68) printf 'SUPER CTRL' ;;
+    69) printf 'SUPER SHIFT CTRL' ;;
+    72) printf 'SUPER ALT' ;;
+    73) printf 'SUPER SHIFT ALT' ;;
+    76) printf 'SUPER CTRL ALT' ;;
+    77) printf 'SUPER SHIFT CTRL ALT' ;;
+    *)  printf '%s' "$1" ;;
+  esac
+}
+
+# XKB keycode -> keycap symbol, for the keys this config binds. The number
+# row (10-19) covers the workspace binds; unlisted codes show as code:N.
+keycode_symbol() {
+  case "$1" in
+    1[0-9]) printf '%s' "$(($1 - 9))" ;;
+    20) printf 'MINUS' ;;
+    21) printf 'EQUAL' ;;
+    49) printf '~' ;;
+    59) printf 'COMMA' ;;
+    60) printf 'PERIOD' ;;
+    61) printf 'SLASH' ;;
+    *) return 1 ;;
+  esac
+}
+
+# Fetch the live bind table and patch it into full records: unit-separated
+# fields in, tab-separated (mod, key, description, dispatcher, arg) out.
+dynamic_bindings() {
+  hyprctl binds | awk '
+    function emit() {
+      if (!seen) return
+      seen = 0
+      printf "%s\x1f%s\x1f%s\x1f%s\x1f%s\n", f["modmask"], f["key"], f["keycode"], f["description"], f["dispatcher"] (f["arg"] != "" ? "\x1f" f["arg"] : "")
+    }
+    /^bind/ { emit(); seen = 1; delete f; next }
+    seen && match($0, /^\t[a-z]+: /) { f[substr($0, 2, RLENGTH - 3)] = substr($0, RLENGTH + 1) }
+    END { emit() }
+  ' |
+    while IFS=$'\x1f' read -r modmask key keycode description dispatcher arg; do
+      # Lua binds report their full display key ("SUPER + code:10"); the
+      # modifiers already ride separately in modmask.
+      key="${key##* + }"
+
+      if [[ -z $key && $keycode != "0" ]]; then
+        key="code:$keycode"
+      fi
+
+      if [[ -z $key && -n $description ]]; then
+        key="${LUA_BIND_KEY_MAP["$modmask,$description"]}"
+      fi
+
+      if [[ $dispatcher == "__lua" && -n $description && -n $key ]]; then
+        cache_key="$modmask,$description,$key"
+        dispatcher="${LUA_BIND_DISPATCHER_MAP["$cache_key"]}"
+        arg="${LUA_BIND_ARG_MAP["$cache_key"]}"
+      fi
+
+      # No description means no text worth a row.
+      [[ -z $description ]] && continue
+
+      case "$key" in
+        comma) key="COMMA" ;;
+        grave) key="~" ;;
+        period) key="PERIOD" ;;
+        minus) key="MINUS" ;;
+        equal) key="EQUAL" ;;
+        slash) key="SLASH" ;;
+      esac
+
+      if [[ $key == code:* ]]; then
+        if symbol=$(keycode_symbol "${key#code:}"); then
+          key="$symbol"
+        fi
+      fi
+
+      case "$key" in
+        mouse:272) key="LEFT MOUSE BUTTON" ;;
+        mouse:273) key="RIGHT MOUSE BUTTON" ;;
+        mouse:274) key="MIDDLE MOUSE BUTTON" ;;
+      esac
+
+      printf '%s\t%s\t%s\t%s\t%s\n' "$(modmask_to_text "$modmask")" "$key" "$description" "$dispatcher" "$arg"
+    done
+}
+
+# Merge alternate chords onto one row: chords that run the same action,
+# dispatcher, and arg are the pairs this config binds twice on purpose
+# (SUPER W / SUPER Q close the window; the scratchpad has two doors).
+# Anything that merely shares a label — the ALT TAB pair, cycling and
+# revealing through one chord — keeps its own row.
+merge_alternate_chords() {
+  awk -F '\t' '
+{
+    key_combo = ($1 == "" ? $2 : $1 " + " $2)
+    action = $3
+    dispatcher = $4
+
+    arg = ""
+    for (i = 5; i <= NF; i++) arg = arg $i (i < NF ? "\t" : "")
+
+    if (action != "") {
+      action_key = action SUBSEP dispatcher SUBSEP arg
+
+      if (action_key in leads) {
+        chords[leads[action_key]] = chords[leads[action_key]] " / " key_combo
+        next
+      }
+
+      leads[action_key] = ++entries
+      chords[entries] = key_combo
+      actions[entries] = action
+      dispatchers[entries] = dispatcher
+      args[entries] = arg
+    }
+}
+END {
+    for (entry = 1; entry <= entries; entry++) {
+      printf "%s\t%s\t%s\t%s\n", chords[entry], actions[entry], dispatchers[entry], args[entry]
+    }
+}'
+}
+
+output_binding_records_uncached() {
+  local dynamic
+
+  build_lua_bind_cache
+  dynamic=$(dynamic_bindings)
+
+  [[ -n $dynamic ]] || return 1
+  printf '%s\n' "$dynamic" | merge_alternate_chords
+}
+
+# Cache the merged records keyed on the bind table (and active keymap), so
+# SUPER+K twice in a row skips the lua scan. A bind-table change — reload,
+# keymap switch — misses the cache and rebuilds.
+output_binding_records() {
+  local cache_dir cache_file cache_name tmp_file
+
+  cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/granite"
+  cache_name="keybindings-$( { printf 'v1\n'; hyprctl devices 2>/dev/null | grep -F 'active keymap:'; hyprctl binds 2>/dev/null; } | sha256sum | cut -d' ' -f1).records"
+  cache_file="$cache_dir/$cache_name"
+
+  if [[ -s $cache_file ]]; then
+    cat "$cache_file"
+    return 0
+  fi
+
+  mkdir -p "$cache_dir" 2>/dev/null || true
+  tmp_file=$(mktemp "$cache_dir/keybindings.XXXXXX") || { output_binding_records_uncached; return; }
+
+  if output_binding_records_uncached >"$tmp_file"; then
+    mv "$tmp_file" "$cache_file"
+    find "$cache_dir" -maxdepth 1 -type f -name 'keybindings-*.records' ! -name "$cache_name" -delete 2>/dev/null || true
+    cat "$cache_file"
+  else
+    rm -f "$tmp_file"
+  fi
+}
+
+lua_json() {
+  jq -Rn --arg value "$1" '$value | @json'
+}
+
+# Run the picked row. exec rows re-issue the command through Hyprland's Lua
+# dispatcher; lua rows dispatch the recorded expression itself (verified:
+# `hyprctl dispatch "hl.dsp.exec_cmd(...)"` is the same door the config
+# used).
+dispatch_binding() {
+  local dispatcher="$1" arg="$2"
+
+  case "$dispatcher" in
+    exec)
+      [[ -n $arg ]] && hyprctl dispatch "hl.dsp.exec_cmd($(lua_json "$arg"))"
+      ;;
+    lua)
+      [[ -n $arg ]] && hyprctl dispatch "$arg"
+      ;;
+    __lua)
+      echo "granite-keybindings: no dispatch metadata for this row (lua missing from PATH?)" >&2
+      return 1
+      ;;
+    "") return 1 ;;
+    *)
+      if [[ -n $arg ]]; then
+        hyprctl dispatch "$dispatcher" "$arg"
+      else
+        hyprctl dispatch "$dispatcher"
+      fi
+      ;;
+  esac
+}
+
+if [[ ${1:-} == "--print" || ${1:-} == "-p" ]]; then
+  output_binding_records | awk -F '\t' '{ printf "%s → %s\n", $1, $2 }'
+else
+  records=$(output_binding_records)
+
+  # Rows for the launcher's dmenu overlay: "<glyph><TAB>chord<TAB>
+  # description". The glyph is a space — it keeps the label/subtext pair
+  # rideable without planting an icon on every row — and the menu hands
+  # back "chord<TAB>description", the stable key for the lookup below.
+  selection=$(
+    awk -F '\t' '{ printf " \t%s\t%s\n", $1, $2 }' <<<"$records" |
+      granite-menu-select 'Keybindings'
+  ) || exit 0
+
+  # The selection is "chord<TAB>description"; anchor it with the following
+  # tab so SUPER + 1 can never match SUPER + 10's row.
+  record=$(grep -F "$selection"$'\t' <<<"$records" | head -n 1)
+  [[ -z $record ]] && exit 1
+
+  dispatcher=$(cut -f3 <<<"$record")
+  arg=$(cut -f4- <<<"$record")
+  dispatch_binding "$dispatcher" "$arg"
+fi

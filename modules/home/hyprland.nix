@@ -165,6 +165,22 @@
           builtins.readFile ../../config/hypr/bin/granite-menu-input
         ))
 
+        # The keybinds cheat sheet behind SUPER+K (Omarchy's
+        # omarchy-menu-keybindings): every bind listed in the launcher's
+        # dmenu overlay, Enter dispatches the picked row. lua runs the
+        # config under a stub hl to recover what each __lua bind executes;
+        # jq quotes commands back to hyprctl dispatch — the same PATH-baked
+        # recipe as granite-network-status below.
+        (writeShellScriptBin "granite-keybindings" (
+          ''
+            export PATH="${lib.makeBinPath [
+              lua5_4
+              jq
+            ]}:$PATH"
+          ''
+          + builtins.readFile ../../config/hypr/bin/granite-keybindings
+        ))
+
         # M5's clipboard capture, driven by Clipboard.qml's
         # `wl-paste --watch` processes and once at shell startup for the
         # current clipboard. jq is baked into the wrapper's PATH so the

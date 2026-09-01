@@ -418,6 +418,11 @@ bind_cmd("XF86AudioPrev", "Previous track", "qs ipc call media previous", { lock
 
 -- Utilities -----------------------------------------------------------------
 
+-- Every keybind, searchable: the launcher's dmenu overlay lists each bind
+-- with its chord, and Enter dispatches the picked row (Omarchy Quattro's
+-- SUPER+K → omarchy-menu-keybindings — see config/hypr/bin).
+bind_cmd("SUPER + K", "Keybindings", "granite-keybindings")
+
 -- Screenshots: save to ~/Pictures and copy to the clipboard.
 -- TODO(shell): M10 grows Omarchy's capture flow (region picker with
 -- window selection, preview, screen recording) inside the quickshell

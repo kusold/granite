@@ -9,8 +9,22 @@
 #   M4 lock + idle                        <- done
 #   M5 clipboard history                  <- done
 #   M6 background switcher / screensaver  <- done
-# Until then a few stand-ins are used (hyprpolkitagent, playerctl, plain
-# grim/slurp captures) — see config/hypr/hyprland.lua TODOs.
+#   M7 OSD: volume / brightness / media popups for the media keys
+#   M8 audio + media panel: MPRIS now-playing, sink controls
+#   M9 toggle framework + bar indicators: night light, DND, stay
+#      awake — one switch behind a hotkey, a menu row, and a bar glyph
+#   M10 capture flow: frozen region/window picker, screen recording
+#   M11 status panels: network, bluetooth, power, display widgets
+#      opening panels (Omarchy's Super+Ctrl+A/W/B/D/P bindings)
+#   M12 in-shell polkit agent
+#   M13 launcher extras: emoji picker, reminders, command-menu modes
+#   M14 theming: a palette singleton + theme switcher — last because
+#      it touches every QML file's hardcoded colors
+# Deliberately off the roadmap: Omarchy's plugin/manifest platform and
+# their AI agents panel (the shell stays personal, not a platform).
+# Stand-ins until their milestone lands: playerctl (M8), the pkill
+# hyprsunset toggle (M9), plain grim/slurp captures (M10),
+# hyprpolkitagent (M12) — see config/hypr/hyprland.lua TODOs.
 #
 # Exports: flake.modules.homeManager.hyprland
 { ... }:
@@ -101,7 +115,7 @@
         };
       };
 
-      # Interim polkit agent until the quickshell shell grows its own plugin
+      # Interim polkit agent until M12 grows the shell its own
       # (Omarchy Quattro runs its polkit agent inside Quickshell). Modeled on
       # the unit the nixpkgs package ships (libexec binary, session-scoped).
       # Same Hyprland-only condition as quickshell: Plasma ships its own
@@ -163,7 +177,7 @@
         brightnessctl
         hyprsunset # night light
         hyprpicker # color picker
-        playerctl # interim MPRIS control until the shell grows a media panel
+        playerctl # interim MPRIS control until M8's media panel
       ];
     };
 }

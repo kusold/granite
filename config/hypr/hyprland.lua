@@ -322,7 +322,8 @@ end)
 launch_on_start("udiskie --automount --no-notify --no-tray")
 
 -- The polkit agent (hyprpolkitagent) runs as a systemd user service bound
--- to graphical-session.target — see modules/home/hyprland.nix.
+-- to graphical-session.target until M12 moves it in-shell — see
+-- modules/home/hyprland.nix.
 
 -- Applications --------------------------------------------------------------
 
@@ -388,7 +389,8 @@ bind("SUPER + ALT + G", "Move active window out of group", hl.dsp.window.move({ 
 
 -- Media keys ----------------------------------------------------------------
 -- pamixer/brightnessctl stand in for Omarchy's omarchy-audio-* and
--- omarchy-brightness-* wrappers; playerctl for their shell MPRIS panel.
+-- omarchy-brightness-* wrappers; playerctl for their shell MPRIS panel
+-- until M8's media panel (M7's OSD adds the popups these keys lack).
 
 bind_cmd("XF86AudioRaiseVolume", "Volume up", "pamixer -i 5", { locked = true, repeating = true })
 bind_cmd("XF86AudioLowerVolume", "Volume down", "pamixer -d 5", { locked = true, repeating = true })
@@ -406,12 +408,15 @@ bind_cmd("XF86AudioPrev", "Previous track", "playerctl previous", { locked = tru
 -- Utilities -----------------------------------------------------------------
 
 -- Screenshots: save to ~/Pictures and copy to the clipboard.
--- TODO(shell): grow into Omarchy's capture flow (region picker with window
--- selection, preview, screen recording) inside the quickshell shell.
+-- TODO(shell): M10 grows Omarchy's capture flow (region picker with
+-- window selection, preview, screen recording) inside the quickshell
+-- shell.
 bind_cmd("PRINT", "Screenshot", [[sh -c 'grim - | tee "$HOME/Pictures/Screenshot $(date "+%Y-%m-%d at %H.%M.%S").png" | wl-copy']])
 bind_cmd("CTRL + PRINT", "Screenshot region", [[sh -c 'grim -g "$(slurp)" - | tee "$HOME/Pictures/Screenshot $(date "+%Y-%m-%d at %H.%M.%S").png" | wl-copy']])
 bind_cmd("SUPER + PRINT", "Color picker", "sh -c 'pkill hyprpicker || hyprpicker -a'")
 
+-- A bare pkill toggle until M9's framework gives night light its hotkey,
+-- menu row, and bar glyph.
 bind_cmd("SUPER + CTRL + N", "Toggle nightlight", "sh -c 'pkill hyprsunset || hyprsunset -t 4000'")
 
 -- The background switcher and screensaver (M6) live in the quickshell

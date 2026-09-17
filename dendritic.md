@@ -39,7 +39,6 @@ granite/
     ├── overlays/
     │   ├── compose.nix                 # Composes all overlays into default
     │   ├── claude-code.nix
-    │   ├── beads.nix
     │   └── nix-moltbot.nix
     └── home/
         ├── common.nix                  # exports flake.modules.homeManager.common
@@ -142,7 +141,7 @@ The `flake.modules.homeManager.*` exports include `_class = "homeManager"` metad
 - `homeModules.*` - Same modules, for backward compatibility  
 - `homeConfigurations.*` - Standalone home-manager configurations
 - `overlays.default` - Combined overlay with all packages
-- `overlays.{beads,claude-code,nix-moltbot}` - Individual overlays
+- `overlays.{claude-code,nix-moltbot}` - Individual overlays
 - `lib.mkHome` - Helper to create standalone home-manager configs
 
 ## References

@@ -7,8 +7,8 @@
     {
       programs.zsh = {
         enable = true;
-        completionInit = "";      # compinit handled by belak/zsh-utils in custom .zshrc
-        shellAliases = {};        # aliases handled in custom .zshrc
+        completionInit = ""; # compinit handled by belak/zsh-utils in custom .zshrc
+        shellAliases = { }; # aliases handled in custom .zshrc
         initContent = lib.mkMerge [
           (lib.mkBefore ''
             export ZDOTDIR=''${ZDOTDIR:-~/.config/zsh}

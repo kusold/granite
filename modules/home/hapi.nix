@@ -27,7 +27,10 @@
     systemd.user.services.hapi-runner = {
       Unit = {
         Description = "HAPI Runner";
-        After = [ "network.target" "hapi-hub.service" ];
+        After = [
+          "network.target"
+          "hapi-hub.service"
+        ];
         Requires = [ "hapi-hub.service" ];
       };
 

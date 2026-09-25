@@ -173,10 +173,12 @@
         # recipe as granite-network-status below.
         (writeShellScriptBin "granite-keybindings" (
           ''
-            export PATH="${lib.makeBinPath [
-              lua5_4
-              jq
-            ]}:$PATH"
+            export PATH="${
+              lib.makeBinPath [
+                lua5_4
+                jq
+              ]
+            }:$PATH"
           ''
           + builtins.readFile ../../config/hypr/bin/granite-keybindings
         ))

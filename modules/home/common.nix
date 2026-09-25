@@ -77,6 +77,7 @@
         # AI
         llm-agents.ccstatusline
         llm-agents.ccusage
+        llm-agents.herdr
         llm-agents.openspec
         llm-agents.qmd # mini cli search engine for markdown
       ];

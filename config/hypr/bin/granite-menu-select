@@ -1,0 +1,58 @@
+# granite-menu-select — pick one option from the shell's dmenu overlay
+# (Omarchy's `omarchy-menu select`, https://github.com/basecamp/omarchy MIT).
+# Prints the chosen option to stdout; exits non-zero when cancelled.
+#
+# Usage: granite-menu-select <prompt> [option...]
+#
+# Options arrive as arguments, or one per line on stdin when none are given
+# and stdin is not a terminal. A line may be "<glyph><TAB><label>" or
+# "<glyph><TAB><label><TAB><subtext>": the glyph shows in the row but never
+# comes back; with a subtext the answer is "<label><TAB><subtext>", so
+# callers with same-named rows get the subtext back as a stable key.
+#
+# The handshake is Omarchy's: two temp files, paths handed to the shell over
+# qs ipc, and a poll until the shell writes the selection and touches the
+# done file.
+set -euo pipefail
+
+if (( $# < 1 )); then
+  echo "Usage: granite-menu-select <prompt> [option...]" >&2
+  exit 1
+fi
+
+prompt="$1"
+shift
+
+options=()
+if (( $# > 0 )); then
+  options=("$@")
+elif [[ ! -t 0 ]]; then
+  mapfile -t options
+fi
+
+if (( ${#options[@]} == 0 )); then
+  echo "granite-menu-select: no options" >&2
+  exit 1
+fi
+
+selection_file=$(mktemp)
+done_file=$(mktemp)
+rm -f "$done_file"
+trap 'rm -f "$selection_file" "$done_file"' EXIT
+
+# qs ipc passes each argument through untouched, so the option list rides
+# as one newline-joined argument (tab-separated fields survive whole).
+joined=$(printf '%s\n' "${options[@]}")
+
+qs ipc call launcher dmenuSelect "$prompt" "$selection_file" "$done_file" "$joined" >/dev/null
+
+# The shell writes the selection, then the done file; poll until it lands.
+while [[ ! -e $done_file ]]; do
+  sleep 0.05
+done
+
+if [[ -s $selection_file ]]; then
+  cat "$selection_file"
+else
+  exit 1
+fi

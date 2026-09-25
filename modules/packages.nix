@@ -2,8 +2,6 @@
 { ... }:
 {
   perSystem = { pkgs, ... }: {
-    packages = {
-      inherit (pkgs) hapi;
-    };
+    packages = { };
   };
 }

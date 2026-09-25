@@ -1,0 +1,30 @@
+# granite-menu-input — prompt for a line of text in the shell's dmenu
+# overlay (Omarchy's `omarchy-menu input`). Prints the answer to stdout;
+# exits non-zero when cancelled (including an empty answer).
+#
+# Usage: granite-menu-input <prompt>
+#
+# Same temp-file handshake as granite-menu-select.
+set -euo pipefail
+
+prompt="${1:-Input}"
+if (( $# > 0 )); then
+  shift
+fi
+
+selection_file=$(mktemp)
+done_file=$(mktemp)
+rm -f "$done_file"
+trap 'rm -f "$selection_file" "$done_file"' EXIT
+
+qs ipc call launcher dmenuInput "$prompt" "$selection_file" "$done_file" >/dev/null
+
+while [[ ! -e $done_file ]]; do
+  sleep 0.05
+done
+
+if [[ -s $selection_file ]]; then
+  cat "$selection_file"
+else
+  exit 1
+fi

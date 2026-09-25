@@ -1,5 +1,12 @@
 # Agent Instructions
 
+## Git Workflow
+
+- All work happens on branches — never commit directly to `main`/`master`.
+- Commit and push your branch as you go; there is no commit/push approval gate.
+- Follow the existing message style (`feat(quickshell): …`, `fix(quickshell): …`, `chore: …`).
+- At session end: commit anything left over and push the branch.
+
 ## Landing the Plane (Session Completion)
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.

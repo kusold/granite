@@ -211,9 +211,10 @@ PanelWindow {
     // coffee button stands the idle policy down — no screensaver, no idle
     // lock, no idle suspend. Custom SVGs in icons/ (the shell's font
     // glyphs render dim on hosts without the nerd font — see the font
-    // entry in modules/home/hyprland.nix): dim while idle handling runs,
-    // accent-colored while the session is kept awake; a click flips it
-    // (SUPER+CTRL+I is the keyboard route).
+    // entry in modules/home/hyprland.nix): an empty cup in outline while
+    // idle handling runs, a full steaming one in accent while the session
+    // is kept awake; a click flips it (SUPER+CTRL+I is the keyboard
+    // route).
     Rectangle {
       width: 24
       height: 24

@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f2f2f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <!-- granite's stay-awake bar button, idle state: a coffee cup in the
-       bar's foreground color (rendered dim by Bar.qml's opacity). The
-       same drawing in the accent color is stay-awake-on.svg. -->
-  <path d="M7 2v2" />
-  <path d="M11 2v2" />
-  <path d="M15 2v2" />
+  <!-- granite's stay-awake bar button, idle state: an empty coffee cup in
+       outline (no coffee, no steam — the idle policy is running). The
+       enabled state, stay-awake-on.svg, is the same cup filled and
+       steaming in the accent color. -->
   <path d="M4 7h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5V7Z" />
   <path d="M17 9h1.5a3.5 3.5 0 0 1 0 7H17" />
 </svg>

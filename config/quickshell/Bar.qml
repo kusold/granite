@@ -223,7 +223,11 @@ PanelWindow {
       IconImage {
         anchors.centerIn: parent
         implicitSize: 16
-        source: root.idle && root.idle.stayAwake ? "icons/stay-awake-on.svg" : "icons/stay-awake.svg"
+        // IconImage resolves bare relative urls against its own qrc module,
+        // so anchor them to this file explicitly.
+        source: Qt.resolvedUrl(
+          root.idle && root.idle.stayAwake ? "icons/stay-awake-on.svg" : "icons/stay-awake.svg"
+        )
       }
 
       MouseArea {

@@ -98,6 +98,21 @@
           ]
       );
 
+      # The font the shell renders with: every component hardcodes
+      # JetBrainsMono Nerd Font (Omarchy Quattro's bar font) for text and
+      # its icons — the network glyph, the panels' and OSD's icon
+      # codepoints — and a minimal host ships none of it, leaving tofu
+      # boxes everywhere. The xdg fonts dir is the one fontconfig scans
+      # on every distro (NixOS hosts don't scan the home profile by
+      # default), so the module drops the font family there itself — as a
+      # subdirectory, to leave room for a real fonts dir of the user's own.
+      # (The bar's stay-awake button draws custom SVGs instead — see
+      # config/quickshell/icons/ — so it renders even before this lands.)
+      # Written through home.file (the primitive xdg.dataFile expands to
+      # ~/.local/share) so it merges beside the wallpaper set above.
+      home.file.".local/share/fonts/nerd-fonts-jetbrains-mono".source =
+        "${pkgs.nerd-fonts.jetbrains-mono}/share/fonts";
+
       # One shell instance per graphical session, like Omarchy's
       # omarchy-launch-shell (which supervises theirs from Hyprland
       # autostart; a systemd unit does the same job here).

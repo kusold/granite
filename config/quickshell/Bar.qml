@@ -208,23 +208,22 @@ PanelWindow {
     spacing: 2
 
     // M9's stay-awake toggle (Omarchy Quattro's idle indicator): the
-    // coffee glyph stands the idle policy down — no screensaver, no idle
-    // lock, no idle suspend. Dim while idle handling runs, accent-colored
-    // while the session is kept awake; a click flips it (SUPER+CTRL+I is
-    // the keyboard route).
+    // coffee button stands the idle policy down — no screensaver, no idle
+    // lock, no idle suspend. Custom SVGs in icons/ (the shell's font
+    // glyphs render dim on hosts without the nerd font — see the font
+    // entry in modules/home/hyprland.nix): dim while idle handling runs,
+    // accent-colored while the session is kept awake; a click flips it
+    // (SUPER+CTRL+I is the keyboard route).
     Rectangle {
       width: 24
       height: 24
       radius: 4
       color: stayAwakeMouse.containsMouse ? "#33ffffff" : "transparent"
 
-      Text {
+      IconImage {
         anchors.centerIn: parent
-        text: "󰅶"
-        color: root.idle && root.idle.stayAwake ? root.accent : root.foreground
-        opacity: root.idle && root.idle.stayAwake ? 1 : 0.5
-        font.family: root.fontFamily
-        font.pixelSize: 14
+        implicitSize: 16
+        source: root.idle && root.idle.stayAwake ? "icons/stay-awake-on.svg" : "icons/stay-awake.svg"
       }
 
       MouseArea {

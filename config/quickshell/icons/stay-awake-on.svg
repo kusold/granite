@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00ff99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- granite's stay-awake bar button, active state: the same coffee cup
+       as stay-awake.svg in the bar's accent color. -->
+  <path d="M7 2v2" />
+  <path d="M11 2v2" />
+  <path d="M15 2v2" />
+  <path d="M4 7h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5V7Z" />
+  <path d="M17 9h1.5a3.5 3.5 0 0 1 0 7H17" />
+</svg>

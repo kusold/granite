@@ -115,14 +115,21 @@ Item {
     // The write-through is guarded so a load-time hydration can never
     // clobber the file with the default before it was read.
     if (service.settingsLoaded) settingsSaveTimer.restart()
-    // Feedback for the toggle — injected directly, so it shows even though
-    // DND was just turned on (the user just acted; hiding the confirmation
-    // would look like a dead keybind).
+    // Feedback for the toggle — injected, so it shows even though DND was
+    // just turned on (the user just acted; hiding the confirmation would
+    // look like a dead keybind).
+    shellToast(value ? "Do not disturb on" : "Do not disturb off")
+  }
+
+  // Shell-internal confirmation toasts for other services (Omarchy's
+  // own-confirmation pattern, their one exemption from silencing): the
+  // stay-awake toggle uses this, so its feedback always shows.
+  function shellToast(summary) {
     pushToast({
       originalId: -1,
       app: "granite-shell",
       appIcon: "",
-      summary: value ? "Do not disturb on" : "Do not disturb off",
+      summary: summary,
       body: "",
       image: "",
       urgency: NotificationUrgency.Low,

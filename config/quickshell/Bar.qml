@@ -21,6 +21,10 @@ PanelWindow {
   // reads its NetworkManager state directly.
   property var networkPanel: null
 
+  // Wired to the shell's Idle instance by shell.qml; the stay-awake
+  // glyph flips the idle policy off/on (M9).
+  property var idle: null
+
   readonly property string fontFamily: "JetBrainsMono Nerd Font"
   readonly property color foreground: "#f2f2f2"
   readonly property color accent: "#00ff99"
@@ -202,6 +206,36 @@ PanelWindow {
     anchors.rightMargin: 8
     anchors.verticalCenter: parent.verticalCenter
     spacing: 2
+
+    // M9's stay-awake toggle (Omarchy Quattro's idle indicator): the
+    // coffee glyph stands the idle policy down — no screensaver, no idle
+    // lock, no idle suspend. Dim while idle handling runs, accent-colored
+    // while the session is kept awake; a click flips it (SUPER+CTRL+I is
+    // the keyboard route).
+    Rectangle {
+      width: 24
+      height: 24
+      radius: 4
+      color: stayAwakeMouse.containsMouse ? "#33ffffff" : "transparent"
+
+      Text {
+        anchors.centerIn: parent
+        text: "󰅶"
+        color: root.idle && root.idle.stayAwake ? root.accent : root.foreground
+        opacity: root.idle && root.idle.stayAwake ? 1 : 0.5
+        font.family: root.fontFamily
+        font.pixelSize: 14
+      }
+
+      MouseArea {
+        id: stayAwakeMouse
+
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: if (root.idle) root.idle.toggleStayAwake()
+      }
+    }
 
     // Omarchy's network bar widget, at granite's scale: the connection
     // glyph (wifi signal / ethernet / disconnected) straight off the

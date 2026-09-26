@@ -435,6 +435,12 @@ bind_cmd("SUPER + PRINT", "Color picker", "sh -c 'pkill hyprpicker || hyprpicker
 -- menu row, and bar glyph.
 bind_cmd("SUPER + CTRL + N", "Toggle nightlight", "sh -c 'pkill hyprsunset || hyprsunset -t 4000'")
 
+-- M9's first toggle: stay awake, Omarchy Quattro's "Toggle locking on
+-- idle" binding (SUPER+CTRL+I). While on, the shell's idle policy stands
+-- down — no screensaver, no idle lock, no idle suspend — until toggled
+-- back; the bar's coffee glyph shows the state and flips it too.
+bind_cmd("SUPER + CTRL + I", "Toggle stay awake", "qs ipc call idle toggle")
+
 -- The background switcher and screensaver (M6) live in the quickshell
 -- shell: SUPER+CTRL+SPACE opens the background picker (Omarchy Quattro's
 -- binding; a desktop double-click opens it too), SUPER+Escape starts the

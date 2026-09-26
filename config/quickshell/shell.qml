@@ -3,7 +3,7 @@
 // the notifications daemon (toast stack, do-not-disturb, in-memory
 // history), the launcher (fuzzy app search over desktop entries, launched
 // through uwsm), the lock screen (ext-session-lock + PAM), the idle policy
-// (lock / suspend timers), the session menu (power actions), the clipboard
+// (lock / suspend timers, stay-awake toggle), the session menu (power actions), the clipboard
 // history (wl-paste capture, searchable picker), the background +
 // screensaver (per-screen wallpaper surface, thumbnail picker, idle
 // slideshow), the OSD (volume / brightness / media popups for the media
@@ -37,13 +37,16 @@ ShellRoot {
         // dies silently. Distinct names reach the ids.
         calendar: calendarPanel
         networkPanel: networkPanelService
+        idle: idleService
       }
     }
   }
 
   // One notifications daemon for the session; it opens its own toast
   // window per screen (see Notifications.qml).
-  Notifications { }
+  Notifications {
+    id: notifications
+  }
 
   // The launcher opens its own overlay on the focused monitor (see
   // Launcher.qml).
@@ -58,7 +61,12 @@ ShellRoot {
 
     backgroundService: background
   }
-  Idle { lock: lock }
+  Idle {
+    id: idleService
+
+    lock: lock
+    notifications: notifications
+  }
   SessionMenu { lock: lock }
 
   // M5: the clipboard history — capture watchers plus the picker overlay
@@ -70,6 +78,7 @@ ShellRoot {
   Screensaver {
     background: background
     lock: lock
+    idle: idleService
   }
 
   // M7: the OSD — volume / brightness / media popups for the media keys

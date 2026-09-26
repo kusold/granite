@@ -27,6 +27,10 @@ Item {
   property var background: null
   property var lock: null
 
+  // Wired to the shell's Idle instance by shell.qml: stay awake (M9)
+  // stands the screensaver down with the rest of the idle policy.
+  property var idle: null
+
   // Palette shared with Bar.qml.
   readonly property string fontFamily: "JetBrainsMono Nerd Font"
   readonly property color foreground: "#f2f2f2"
@@ -57,12 +61,25 @@ Item {
     timeout: service.screensaverTimeoutSeconds
     respectInhibitors: true
     // While locked the lock surface owns the outputs; there is nothing
-    // to save them from.
-    enabled: service.lock === null || !service.lock.locked
+    // to save them from. Stay awake (M9) stands the screensaver down
+    // with the rest of the idle policy.
+    enabled: (service.lock === null || !service.lock.locked)
+      && (service.idle === null || !service.idle.stayAwake)
 
     onIsIdleChanged: {
       if (isIdle && enabled) service.show()
       else service.hide()
+    }
+  }
+
+  Connections {
+    target: service.idle
+
+    // Turning stay awake on mid-idle dismisses a running screensaver —
+    // the session was just told not to idle, so nothing should be on
+    // screen saying otherwise.
+    function onStayAwakeChanged() {
+      if (service.idle && service.idle.stayAwake) service.hide()
     }
   }
 

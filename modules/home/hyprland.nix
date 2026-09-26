@@ -13,6 +13,8 @@
 #   M8 audio + media panel: MPRIS now-playing, sink controls <- done
 #   M9 toggle framework + bar indicators: night light, DND, stay
 #      awake — one switch behind a hotkey, a menu row, and a bar glyph
+#      (stay awake landed first: SUPER+CTRL+I + the bar's coffee glyph;
+#      night light still runs its pkill stand-in, DND lacks its glyph)
 #   M10 capture flow: frozen region/window picker, screen recording
 #   M11 status panels: network done (connection hero, stats grid, wifi
 #      list); bluetooth, power, display widgets still to come — panels

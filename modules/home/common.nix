@@ -4,7 +4,12 @@
 { ... }:
 {
   flake.modules.homeManager.common =
-    { lib, pkgs, ... }:
+    {
+      lib,
+      pkgs,
+      pkgs-unstable,
+      ...
+    }:
     {
       # mkDefault (priority 1000) works in every context:
       #  - standalone `home-manager switch`: provides pkgs.nix so the
@@ -57,6 +62,7 @@
         k9s
         kubernetes-helm
         nixd # Nix LSP
+        pkgs-unstable.nh
         nixpkgs-fmt
         opentofu
         ponysay

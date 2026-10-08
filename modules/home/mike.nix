@@ -49,7 +49,6 @@ in
 
           # From Overlays
           llm-agents.ccusage
-          llm-agents.happy-coder
           llm-agents.opencode
         ])
         # Packages from unstable channel

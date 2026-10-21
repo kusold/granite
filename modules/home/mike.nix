@@ -25,6 +25,7 @@ in
           bfg-repo-cleaner
           exiftool
           fdupes
+          forgejo-cli # CLI for interacting with Forgejo instances
           git-filter-repo
           gitleaks
           go-migrate

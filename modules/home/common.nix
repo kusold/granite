@@ -54,6 +54,7 @@
       home.packages = with pkgs; [
         awscli2
         btop
+        pkgs-unstable.defuddle
         devenv # devenv.sh; paired with programs.direnv above via `use devenv`
         fzf
         gh

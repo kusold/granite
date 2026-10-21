@@ -21,6 +21,7 @@ in
         llm-agents.ccusage
         llm-agents.claude-code
         llm-agents.codex
+        llm-agents.maki
         llm-agents.openclaw
         llm-agents.pi
       ];

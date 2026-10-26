@@ -18,6 +18,7 @@ in
 
       home.packages = with pkgs; [
         bun
+        forgejo-cli
         llm-agents.ccusage
         llm-agents.claude-code
         llm-agents.codex

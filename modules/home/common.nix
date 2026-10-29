@@ -62,6 +62,7 @@
         go
         k9s
         kubernetes-helm
+        mdterm
         nixd # Nix LSP
         pkgs-unstable.nh
         nixpkgs-fmt

@@ -30,6 +30,14 @@
         # nvim-treesitter `main` branch builds parsers via the tree-sitter CLI
         tree-sitter
         unzip
+
+        # snacks.nvim (image, picker, lazygit) external tools
+        fd # Snacks.picker.explorer
+        ghostscript # PDF rendering (gs)
+        imagemagick # image conversion (magick)
+        lazygit
+        mermaid-cli # mermaid diagrams (mmdc)
+        tectonic # LaTeX math rendering
       ];
     };
 }

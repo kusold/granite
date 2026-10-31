@@ -19,6 +19,14 @@
     # Let llm-agents use its own nixpkgs so every package hits the cache.
     # (Same reasoning as rockymtn's hermes-agent input.)
     llm-agents.url = "github:numtide/llm-agents.nix";
+
+    # Rex, the multiplexer for all work (https://www.superlogical.com/rex).
+    # Prebuilt-binary flake, one URL per channel: stable (no releases yet),
+    # preview (tagged previews of the next release), snapshot (every build).
+    # Deliberately NOT following nixpkgs: the flake pins its own
+    # nixpkgs-unstable for the fetchurl/patchelf/glibc/pam wrapper around the
+    # released binary, and those are cheap to build.
+    rex.url = "https://pkgs.superlogical.com/rex/nix/preview.tar.gz";
   };
 
   # Declare the numtide binary cache so standalone granite builds (home-manager

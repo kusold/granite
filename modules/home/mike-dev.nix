@@ -12,6 +12,7 @@ in
         localModules.mike
         localModules.openclaw
         localModules.hyprland
+        localModules.rex
       ];
 
       services.ssh-agent.enable = true;

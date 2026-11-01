@@ -50,7 +50,7 @@ in
 
           # From Overlays
           llm-agents.ccusage
-          llm-agents.opencode
+          llm-agents.opencode2
         ])
         # Packages from unstable channel
         ++ (with pkgs-unstable; [

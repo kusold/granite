@@ -80,6 +80,7 @@
         vim
         wget
         yadm
+        yazi
         yq
 
         # AI

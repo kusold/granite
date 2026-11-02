@@ -36,6 +36,11 @@ in
 
         # AI
         pkgs.dolt
+
+        # Fonts (installed to ~/Library/Fonts/HomeManager on darwin)
+        pkgs.jetbrains-mono
+        pkgs.fira-code
+        pkgs.source-code-pro
       ];
 
       # gh is enabled in the shared git module; the host config is user-specific.

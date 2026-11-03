@@ -63,6 +63,7 @@
         k9s
         kubernetes-helm
         lazygit
+        lazyjj
         mdterm
         nixd # Nix LSP
         pkgs-unstable.nh

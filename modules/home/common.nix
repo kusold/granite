@@ -60,6 +60,7 @@
         gh
         git
         go
+        jujutsu
         k9s
         kubernetes-helm
         lazygit

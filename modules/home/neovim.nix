@@ -36,6 +36,7 @@
         ghostscript # PDF rendering (gs)
         imagemagick # image conversion (magick)
         lazygit
+        marksman # markdown LSP (Mason's binary is dynamically linked and fails on NixOS)
         mermaid-cli # mermaid diagrams (mmdc)
         tectonic # LaTeX math rendering
       ];

@@ -53,6 +53,7 @@
 
       home.packages = with pkgs; [
         awscli2
+        blazingjj
         btop
         pkgs-unstable.defuddle
         devenv # devenv.sh; paired with programs.direnv above via `use devenv`

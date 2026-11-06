@@ -36,7 +36,7 @@
         ghostscript # PDF rendering (gs)
         imagemagick # image conversion (magick)
         lazygit
-        marksman # markdown LSP (Mason's binary is dynamically linked and fails on NixOS)
+        marksman # markdown LSP; prebuilt via overlays/marksman.nix (Mason's binary fails on NixOS; nixpkgs builds it from .NET source)
         mermaid-cli # mermaid diagrams (mmdc)
         tectonic # LaTeX math rendering
       ];

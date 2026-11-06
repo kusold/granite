@@ -1,0 +1,31 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // Scoped to the marksman custom manager on purpose: flake.lock updates are
+  // handled by .github/workflows/update-flake-lock.yml. Drop `enabledManagers`
+  // to let Renovate manage GitHub Actions and more.
+  enabledManagers: ["regex"],
+  customManagers: [
+    {
+      customType: "regex",
+      description: "marksman release binaries in the nix overlay",
+      fileMatch: ["modules/overlays/marksman\\.nix$"],
+      // Per asset: repo + tag from the url, unique depName from the asset
+      // filename, and the hex sha256 next to it. github-release-attachments
+      // finds which asset a digest belongs to by hashing them itself, then
+      // maps it to the new release — so all three pins update together.
+      matchStrings: [
+        "url = \"https://github\\.com/(?<packageName>[^/\"]+/[^/\"]+)/releases/download/(?<currentValue>[^/\"]+)/(?<depName>[^/\"]+)\";\\s*hash = \"sha256:(?<currentDigest>[0-9a-f]{64})\";",
+      ],
+      datasourceTemplate: "github-release-attachments",
+      // Tags are dates (e.g. 2026-02-08), which semver can't compare.
+      versioningTemplate: "regex:^(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})$",
+    },
+  ],
+  packageRules: [
+    {
+      // One branch/PR for all three marksman pins.
+      matchDatasources: ["github-release-attachments"],
+      groupName: "marksman",
+    },
+  ],
+}

@@ -1,5 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["local>kusold/renovate-config"],
   // No enabledManagers allowlist: Renovate manages GitHub Actions and anything
   // else it finds. The one carve-out is nix lock-file maintenance — see
   // packageRules.

@@ -1,7 +1,8 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   // No enabledManagers allowlist: Renovate manages GitHub Actions and anything
-  // else it finds. The one exclusion is the nix manager — see packageRules.
+  // else it finds. The one carve-out is nix lock-file maintenance — see
+  // packageRules.
   customManagers: [
     {
       customType: "regex",
@@ -21,9 +22,12 @@
   ],
   packageRules: [
     {
-      // flake.lock is owned by .github/workflows/update-flake-lock.yml, which
-      // commits straight to main — keep Renovate's nix manager out of it.
+      // flake.lock freshness is owned by .github/workflows/update-flake-lock.yml,
+      // which commits straight to main. If the nix manager is ever enabled
+      // (it's opt-in/beta today), let it bump input refs/revs — just never
+      // regenerate flake.lock wholesale.
       matchManagers: ["nix"],
+      matchUpdateTypes: ["lockFileMaintenance"],
       enabled: false,
     },
     {
